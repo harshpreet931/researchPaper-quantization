@@ -1,0 +1,22 @@
+{
+  "model": "Phi-2",
+  "model_id": "microsoft/phi-2",
+  "quant_method": "fp16",
+  "timestamp": "2026-03-04T14:43:42.989733",
+  "load_time_seconds": 10.286235094070435,
+  "parameters": 2779683840,
+  "model_size_gb": 5.1775646805763245,
+  "total_latency_seconds": 1.0712988609999978,
+  "tokens_generated": 32.0,
+  "ms_per_token": 33.47808940624993,
+  "tokens_per_second": 29.87028285471132,
+  "std_latency": 0.024920599535107613,
+  "accuracy": 0.0,
+  "correct": 0,
+  "total": 5,
+  "duration_seconds": 18.044071912765503,
+  "duration_minutes": 0.30073453187942506,
+  "emissions_kg": 0.00017340783343868028,
+  "energy_consumed_kwh": 0.00024305840768708314,
+  "status": "success"
+}

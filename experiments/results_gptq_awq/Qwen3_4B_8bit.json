@@ -1,0 +1,17 @@
+{
+  "model": "Qwen3-4B",
+  "quant_method": "8bit",
+  "model_path": "mlx_models/qwen3-4b-8bit",
+  "timestamp": "2026-03-04T15:46:28.137661",
+  "load_time_seconds": 1.3157048225402832,
+  "parameters": 1131460096,
+  "model_size_gb": 3.980525016784668,
+  "bits_per_weight": 30.219757335569348,
+  "total_latency_seconds": 0.7373855276666662,
+  "ms_per_token": 23.04329773958332,
+  "tokens_per_second": 43.39656638130487,
+  "accuracy": 100.0,
+  "correct": 5,
+  "total": 5,
+  "status": "success"
+}

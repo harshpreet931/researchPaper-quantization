@@ -1,0 +1,17 @@
+{
+  "model": "Phi-2",
+  "quant_method": "8bit",
+  "model_path": "mlx_models/phi-2-8bit",
+  "timestamp": "2026-03-04T15:46:36.093579",
+  "load_time_seconds": 0.8229038715362549,
+  "parameters": 782474240,
+  "model_size_gb": 2.7514171600341797,
+  "bits_per_weight": 30.204819828956925,
+  "total_latency_seconds": 0.49273716666666684,
+  "ms_per_token": 15.398036458333339,
+  "tokens_per_second": 64.94334538731431,
+  "accuracy": 100.0,
+  "correct": 5,
+  "total": 5,
+  "status": "success"
+}

@@ -1,0 +1,22 @@
+{
+  "model": "Qwen3-4B",
+  "model_id": "Qwen/Qwen3-4B",
+  "quant_method": "fp16",
+  "timestamp": "2026-03-04T14:44:46.428933",
+  "load_time_seconds": 63.0141019821167,
+  "parameters": 4022468096,
+  "model_size_gb": 7.492430925369263,
+  "total_latency_seconds": 2.038877639000001,
+  "tokens_generated": 32.0,
+  "ms_per_token": 63.71492621875004,
+  "tokens_per_second": 15.694909487405479,
+  "std_latency": 0.08421885222196579,
+  "accuracy": 100.0,
+  "correct": 5,
+  "total": 5,
+  "duration_seconds": 162.1555631160736,
+  "duration_minutes": 2.7025927186012266,
+  "emissions_kg": 0.0015658398846545279,
+  "energy_consumed_kwh": 0.002194771375144585,
+  "status": "success"
+}

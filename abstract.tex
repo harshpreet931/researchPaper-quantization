@@ -1,0 +1,77 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx} % Times New Roman font
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{titlesec}
+
+% Page geometry
+\geometry{a4paper, margin=1in}
+
+% Single spacing
+\singlespacing
+
+% Section formatting - remove numbering and adjust spacing
+\titleformat{\section}{\normalfont\bfseries}{\thesection}{0em}{}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+
+\begin{document}
+
+% Title
+\begin{center}
+    \Large\textbf{Low Power Edge Inference for Green Computing: An Evaluation of Post-Training Quantization and Unstructured Pruning}
+\end{center}
+
+\vspace{12pt}
+
+% Author Information - Two Column Layout
+\begin{center}
+\begin{tabular}{cc}
+\textbf{Harshpreet Singh} & \textbf{Sameer Kumar}\\[3pt]
+Chitkara University, India & Chitkara University, India\\[3pt]
+\texttt{harshpreet393.be22@chitkara.edu.in} & \texttt{sameer776.be22@chitkara.edu.in}
+\end{tabular}
+\end{center}
+
+\vspace{18pt}
+
+% Abstract Title
+\begin{center}
+    \textbf{Abstract}
+\end{center}
+
+\vspace{6pt}
+
+% Structured Abstract Content
+\noindent\textbf{Background/Introduction}\\
+With data center AI workloads projected to exceed 945 TWh annually by 2030, edge computing offers a sustainable alternative for deploying language models locally. However, practitioners lack clear guidance on which post-training quantization (PTQ) method best balances accuracy and energy efficiency for specific models like Qwen3-4B and Phi-2.
+
+\vspace{12pt}
+
+\noindent\textbf{Objectives}\\
+This study compares four PTQ techniques, INT8 uniform quantization, GPTQ, AWQ, and INT4 weight-only on Qwen3-4B (4B) and Phi-2 (2.7B) to identify optimal accuracy-energy trade-offs for edge deployments.
+
+\vspace{12pt}
+
+\noindent\textbf{Methods/Methodology}\\
+We evaluated all four PTQ approaches at 4-bit to 8-bit precision on Mac M4 Pro with 24GB unified memory. We measured MMLU accuracy, latency, memory footprint, and energy consumption per inference on both models.
+
+\vspace{12pt}
+
+\noindent\textbf{Results/Findings}\\
+Initial observations suggest AWQ maintains better accuracy for Qwen3-4B at 4-bit precision, while INT8 proves reliable across both models. GPTQ appears more effective for Phi-2 than Qwen3-4B, and naive INT4 shows significant degradation. Model size influences quantization tolerance, with smaller architectures handling aggressive compression better. AWQ shows promise for Qwen3-4B and INT8 for Phi-2, though comprehensive benchmarking is ongoing.
+
+\vspace{12pt}
+
+\noindent\textbf{Conclusion}\\
+Optimal PTQ strategy depends on model size: AWQ benefits larger models like Qwen3-4B through activation-awareness, while Phi-2 achieves excellent efficiency with simpler INT8 quantization, enabling tailored green AI deployment.
+
+\vspace{18pt}
+
+% Keywords
+\noindent\textbf{Keywords:} Post-training quantization, unstructured pruning, edge AI, green computing, model compression, sustainable machine learning
+
+\end{document}

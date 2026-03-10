@@ -1,0 +1,17 @@
+{
+  "model": "Phi-2",
+  "quant_method": "fp16",
+  "model_path": "microsoft/phi-2",
+  "timestamp": "2026-03-04T15:46:15.575418",
+  "load_time_seconds": 2.4524319171905518,
+  "parameters": 2779683840,
+  "model_size_gb": 5.17756462097168,
+  "bits_per_weight": 16.0,
+  "total_latency_seconds": 0.8167009996666673,
+  "ms_per_token": 25.521906239583355,
+  "tokens_per_second": 39.18202624101189,
+  "accuracy": 100.0,
+  "correct": 5,
+  "total": 5,
+  "status": "success"
+}
