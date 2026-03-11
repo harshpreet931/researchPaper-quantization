@@ -63,38 +63,62 @@ def list_ollama_models():
 
 
 def run_ollama_inference(model_name: str, prompt: str, timeout: int = 120):
-    """Run inference using Ollama CLI.
+    """Run inference using Ollama API with thinking disabled.
     
     Returns:
         tuple: (output_text, latency_seconds, tokens_generated) or (None, None, None) on error
     """
-    # Add /no_think for qwen models to disable thinking mode
-    if "qwen" in model_name.lower():
-        prompt = prompt + " /no_think"
+    import urllib.request
+    import json
+    
+    # Use Ollama API with think: false for Qwen models
+    is_qwen = "qwen" in model_name.lower()
+    
+    payload = {
+        "model": model_name,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "num_predict": 128  # Limit output tokens for benchmark
+        }
+    }
+    
+    # Disable thinking for Qwen3.5 models
+    if is_qwen:
+        payload["think"] = False
+    
     try:
         start_time = time.perf_counter()
-        result = subprocess.run(
-            ["ollama", "run", model_name, prompt],
-            capture_output=True,
-            text=True,
-            timeout=timeout
+        
+        req = urllib.request.Request(
+            "http://localhost:11434/api/generate",
+            data=json.dumps(payload).encode('utf-8'),
+            headers={'Content-Type': 'application/json'}
         )
+        
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            result = json.loads(response.read().decode('utf-8'))
+        
         latency = time.perf_counter() - start_time
         
-        if result.returncode != 0:
+        if 'error' in result:
+            print(f"  API Error: {result['error']}")
             return None, None, None
         
-        output_text = result.stdout.strip()
-        # Estimate tokens (rough approximation: ~4 chars per token)
-        tokens = len(output_text) / 4
+        output_text = result.get('response', '').strip()
+        # Get actual token count from API response
+        tokens = result.get('eval_count', len(output_text) / 4)
         
         return output_text, latency, tokens
         
-    except subprocess.TimeoutExpired:
+    except urllib.error.URLError as e:
+        print(f"  Connection error: {e}")
         return None, None, None
     except Exception as e:
         print(f"  Error during inference: {e}")
         return None, None, None
+
+
     """Run inference using Ollama CLI.
     
     Returns:
@@ -319,9 +343,10 @@ def main():
     
     # Default models to benchmark
     default_models = [
-        "qwen3:4b",
-        "phi3:mini",
-        "ministral-3:3b",
+        "qwen3.5:0.8b",
+        "qwen3.5:2b",
+        "qwen3.5:4b",
+        "phi3:instruct",
     ]
     
     models_to_benchmark = args.models if args.models else default_models

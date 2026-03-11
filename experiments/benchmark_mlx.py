@@ -11,18 +11,26 @@ from pathlib import Path
 RESULTS_DIR = Path("results_gptq_awq")
 RESULTS_DIR.mkdir(exist_ok=True)
 
-def run_benchmark(model_path: str, model_name: str, quant_method: str):
-    """Run benchmark on a model."""
+def run_benchmark(model_path: str, model_name: str, quant_method: str, enable_thinking: bool = False):
+    """Run benchmark on a model.
+    
+    Args:
+        model_path: Path to the model (HuggingFace ID or local path)
+        model_name: Display name for the model
+        quant_method: Quantization method (fp16, 4bit, 8bit)
+        enable_thinking: Enable thinking mode for Qwen3.5 models
+    """
     from mlx_lm import load, generate
     
     print(f"\n{'='*60}")
-    print(f"BENCHMARK: {model_name} ({quant_method})")
+    print(f"BENCHMARK: {model_name} ({quant_method}){' [thinking]' if enable_thinking else ''}")
     print(f"{'='*60}")
     
     result = {
         "model": model_name,
         "quant_method": quant_method,
         "model_path": model_path,
+        "enable_thinking": enable_thinking,
         "timestamp": datetime.now().isoformat(),
     }
     
@@ -52,12 +60,18 @@ def run_benchmark(model_path: str, model_name: str, quant_method: str):
         num_runs = 3
         
         # Warmup
-        _ = generate(model, tokenizer, prompt, max_tokens=max_tokens, verbose=False)
+        warmup_kwargs = {"max_tokens": max_tokens, "verbose": False}
+        if enable_thinking:
+            warmup_kwargs["enable_thinking"] = True
+        _ = generate(model, tokenizer, prompt, **warmup_kwargs)
         
         latencies = []
         for _ in range(num_runs):
             start = time.perf_counter()
-            _ = generate(model, tokenizer, prompt, max_tokens=max_tokens, verbose=False)
+            gen_kwargs = {"max_tokens": max_tokens, "verbose": False}
+            if enable_thinking:
+                gen_kwargs["enable_thinking"] = True
+            _ = generate(model, tokenizer, prompt, **gen_kwargs)
             latencies.append(time.perf_counter() - start)
         
         avg_latency = sum(latencies) / len(latencies)
@@ -105,22 +119,40 @@ def run_benchmark(model_path: str, model_name: str, quant_method: str):
 
 
 def main():
+    # Updated model list with Qwen3.5 and Phi-3 Mini
+    # Note: Speculative decoding is disabled due to known bugs
     models = [
-        ("Qwen/Qwen3-4B", "Qwen3-4B", "fp16"),
-        ("microsoft/phi-2", "Phi-2", "fp16"),
-        ("mlx_models/qwen3-4b-4bit", "Qwen3-4B", "4bit"),
-        ("mlx_models/qwen3-4b-8bit", "Qwen3-4B", "8bit"),
-        ("mlx_models/phi-2-4bit", "Phi-2", "4bit"),
-        ("mlx_models/phi-2-8bit", "Phi-2", "8bit"),
+        # Qwen3.5 FP16 models
+        ("Qwen/Qwen3.5-0.8B", "Qwen3.5-0.8B", "fp16", False),
+        ("Qwen/Qwen3.5-2B", "Qwen3.5-2B", "fp16", False),
+        ("Qwen/Qwen3.5-4B", "Qwen3.5-4B", "fp16", False),
+        # Qwen3.5 with thinking mode enabled
+        ("Qwen/Qwen3.5-0.8B", "Qwen3.5-0.8B", "fp16", True),
+        ("Qwen/Qwen3.5-2B", "Qwen3.5-2B", "fp16", True),
+        ("Qwen/Qwen3.5-4B", "Qwen3.5-4B", "fp16", True),
+        # Qwen3.5 INT4 (pre-quantized MLX versions)
+        ("mlx-community/Qwen3.5-0.8B-4bit", "Qwen3.5-0.8B", "4bit", False),
+        ("mlx-community/Qwen3.5-2B-4bit", "Qwen3.5-2B", "4bit", False),
+        ("mlx-community/Qwen3.5-4B-4bit", "Qwen3.5-4B", "4bit", False),
+        # Qwen3.5 INT8
+        ("mlx-community/Qwen3.5-0.8B-8bit", "Qwen3.5-0.8B", "8bit", False),
+        ("mlx-community/Qwen3.5-2B-8bit", "Qwen3.5-2B", "8bit", False),
+        ("mlx-community/Qwen3.5-4B-8bit", "Qwen3.5-4B", "8bit", False),
+        # Phi-3 Mini
+        ("mlx-community/Phi-3-mini-4k-instruct", "Phi-3-Mini", "fp16", False),
+        ("mlx-community/Phi-3-mini-4k-instruct-4bit", "Phi-3-Mini", "4bit", False),
+        ("mlx-community/Phi-3-mini-4k-instruct-8bit", "Phi-3-Mini", "8bit", False),
     ]
     
     all_results = []
     
-    for model_path, name, quant in models:
-        result = run_benchmark(model_path, name, quant)
+    for model_path, name, quant, thinking in models:
+        result = run_benchmark(model_path, name, quant, enable_thinking=thinking)
         all_results.append(result)
         
-        fname = f"{name.replace('-', '_')}_{quant}.json"
+        # Create filename with thinking mode suffix if applicable
+        thinking_suffix = "_thinking" if thinking else ""
+        fname = f"{name.replace('-', '_')}_{quant}{thinking_suffix}.json"
         with open(RESULTS_DIR / fname, "w") as f:
             json.dump(result, f, indent=2)
     

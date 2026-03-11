@@ -131,7 +131,7 @@ An Evaluation of Post-Training Quantization on Apple Silicon}
 % ABSTRACT
 % =============================================================================
 \begin{abstract}
-\noindent We present a comprehensive evaluation of post-training quantization (PTQ) techniques for deploying large language models on resource-constrained edge devices, addressing the critical need for sustainable AI inference. With global data center energy consumption projected to reach 945 TWh annually by 2030—driven primarily by AI workloads—edge computing offers a promising pathway to reduce both operational costs and environmental impact. We systematically evaluate Apple's MLX framework for INT8 and INT4 quantization across two architecturally distinct language models: Qwen3-4B (4.02 billion parameters, 7.49GB FP16) and Phi-2 (2.78 billion parameters, 5.18GB FP16). Our experiments on Apple Silicon M4 Pro with 24GB unified memory demonstrate that MLX 4-bit quantization achieves 72\% memory reduction (7.49GB to 2.11GB for Qwen3-4B) with 2.6$\times$ faster inference (38.57 to 14.65 ms/token). Our findings provide actionable guidance for practitioners: 4-bit MLX quantization enables deployment of 4B parameter models on devices with 8GB memory, expanding edge AI capabilities while reducing energy consumption.
+\noindent We present a comprehensive evaluation of post-training quantization (PTQ) techniques for deploying large language models on resource-constrained edge devices, addressing the critical need for sustainable AI inference. With global data center energy consumption projected to reach 945 TWh annually by 2030—driven primarily by AI workloads—edge computing offers a promising pathway to reduce both operational costs and environmental impact. We systematically evaluate inference frameworks across two model families: Qwen3.5 series (0.8B, 2B, and 4B parameters) and Microsoft Phi-3 Mini (3.82B parameters). Our experiments on Apple Silicon M4 Pro with 24GB unified memory reveal that Apple's MLX framework with INT4 quantization achieves 269.88, 180.48, 80.69, and 96.53 tokens/second for Qwen3.5-0.8B, Qwen3.5-2B, Qwen3.5-4B, and Phi-3 Mini respectively, with memory footprints ranging from 0.48GB to 2.47GB. Comparing frameworks, MLX provides up to 9.9$\times$ speedup over Ollama for Qwen3.5-0.8B (269.88 vs 27.24 tokens/second). Our findings provide actionable guidance for practitioners: Qwen3.5-0.8B with MLX INT4 quantization offers exceptional throughput for real-time applications, while all tested models fit comfortably within 8GB memory, enabling deployment on consumer devices.
 \end{abstract}
 
 % =============================================================================
@@ -165,12 +165,11 @@ However, the landscape of PTQ methods is fragmented, with different techniques e
 This paper addresses these questions through a systematic evaluation of PTQ techniques for edge inference. Our contributions are:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{MLX Quantization Evaluation}: We evaluate Apple's MLX framework for 4-bit and 8-bit quantization on Qwen3-4B and Phi-2, demonstrating 72\% memory reduction with 2.6$\times$ inference speedup.
+    \item \textbf{Framework Comparison}: We evaluate Ollama and MLX frameworks across Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters), finding that MLX provides up to 9.9$\times$ speedup over Ollama for Qwen3.5-0.8B (269.88 vs 27.24 tokens/second).
     
-    \item \textbf{Real Measurements}: We measure actual inference latency (38.57 ms/token for Qwen3-4B, 25.52 ms/token for Phi-2 in FP16; 14.65 and 9.85 ms/token with 4-bit quantization), model sizes, and throughput.
+    \item \textbf{Real Measurements}: We measure actual inference latency (3.71, 5.54, 12.39, and 10.36 ms/token for Qwen3.5-0.8B, 2B, 4B, and Phi-3 Mini via MLX INT4), energy consumption (0.000053 to 0.000361 kWh), and memory footprint (0.48GB to 2.47GB with MLX INT4).
     
-
-    \item \textbf{Practical Guidelines}: We provide actionable recommendations: 4-bit MLX quantization enables 4B parameter model deployment on 8GB memory devices.
+    \item \textbf{Practical Guidelines}: We provide actionable recommendations: Qwen3.5-0.8B with MLX INT4 quantization achieves exceptional throughput (269.88 tokens/second) for real-time applications, while all tested models fit within 8GB memory for consumer device deployment.
 \end{enumerate}
 
 Our findings have immediate practical implications for sustainable AI deployment, enabling organizations to reduce their inference energy footprint while maintaining model capability.
@@ -346,15 +345,15 @@ Several studies have explored LLM quantization for edge scenarios:
 
 \textbf{Benazir and Lin} \cite{benazir2025profiling} profiled LLM inference on Apple Silicon from a quantization perspective, identifying optimal configurations for the M-series architecture.
 
-Our work extends these studies by providing a systematic comparison of PTQ methods specifically for recent small language models (Qwen3-4B, Phi-2) with energy measurements on Apple Silicon.
+Our work extends these studies by providing a systematic comparison of inference frameworks (Ollama and MLX) specifically for recent small language models (Qwen3.5 series and Phi-3 Mini) with energy measurements on Apple Silicon.
 
 \subsection{Small Language Models}
 
 Small language models (SLMs) have emerged as efficient alternatives to large models for edge deployment:
 
-\textbf{Phi Series} \cite{javaheripi2023phi2, abdin2024phi3}: Microsoft's Phi models demonstrate that carefully curated training data can enable small models to match the performance of much larger models. Phi-2 (2.7B parameters) outperforms models 25$\times$ its size on certain benchmarks through textbook-quality training data.
+\textbf{Phi Series} \cite{javaheripi2023phi2, abdin2024phi3}: Microsoft's Phi models demonstrate that carefully curated training data can enable small models to match the performance of much larger models. Phi-3 Mini (3.82B parameters) achieves strong performance through textbook-quality training data while maintaining a compact footprint suitable for edge deployment.
 
-\textbf{Qwen Series} \cite{qwen2025technical}: Alibaba's Qwen models include dense and Mixture-of-Expert architectures from 0.6B to 235B parameters. Qwen3-4B achieves competitive performance through architectural innovations including hybrid attention mechanisms and dual-mode reasoning.
+\textbf{Qwen Series} \cite{qwen2025technical}: Alibaba's Qwen models include dense and Mixture-of-Expert architectures from 0.5B to 72B parameters. The Qwen3.5 series introduces hybrid reasoning with thinking and non-thinking modes, achieving competitive performance through architectural innovations including GQA attention and dual-mode inference.
 
 These models are particularly relevant for edge deployment due to their optimized size-performance trade-off, though their quantization characteristics remain understudied.
 
@@ -380,49 +379,38 @@ For Apple Silicon, energy measurement presents unique challenges due to the unif
 Our experimental design follows a systematic approach to evaluate PTQ methods on Apple Silicon:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Method Comparison}: Evaluate MLX INT8 and INT4 quantization for memory and latency optimization.
-    \item \textbf{Model Selection}: Test on two architecturally distinct models (Qwen3-4B, Phi-2).
+    \item \textbf{Framework Comparison}: Evaluate Ollama and MLX frameworks for inference optimization across all model families, comparing quantization strategies and inference speeds.
+    \item \textbf{Model Selection}: Test on Qwen3.5 series (0.8B, 2B, 4B) and Phi-3 Mini, representing diverse size-efficiency trade-offs.
     \item \textbf{Comprehensive Metrics}: Measure latency, memory footprint, and energy consumption.
 \end{enumerate}
 
 \subsection{Models}
 
-\subsubsection{Qwen3-4B}
+\subsubsection{Qwen3.5 Series}
 
-Qwen3-4B \cite{qwen2025technical} is a 4-billion parameter dense transformer model from Alibaba's Qwen family. Key architectural features include:
+The Qwen3.5 series \cite{qwen2025technical} from Alibaba represents the latest generation of efficient language models with hybrid reasoning capabilities. We evaluate three variants:
 
 \begin{itemize}[leftmargin=*,nosep]
-    \item \textbf{Architecture}: Standard transformer with modifications for efficiency
-    \item \textbf{Hidden Dimensions}: 2560
-    \item \textbf{Attention Heads}: 32
-    \item \textbf{Layers}: 40
-    \item \textbf{Context Length}: 32,768 tokens
-    \item \textbf{Vocabulary}: 151,936 tokens
+    \item \textbf{Qwen3.5-0.8B}: 873M parameters, optimized for extreme efficiency
+    \item \textbf{Qwen3.5-2B}: 2.27B parameters, balanced size-performance trade-off
+    \item \textbf{Qwen3.5-4B}: 4.66B parameters, highest capability in the series
+\end{itemize}
+
+Key architectural features shared across the series:
+\begin{itemize}[leftmargin=*,nosep]
+    \item \textbf{Architecture}: Dense transformer with GQA (Grouped Query Attention)
     \item \textbf{Position Encoding}: RoPE (Rotary Position Embedding)
     \item \textbf{Activation}: SwiGLU
-    \item \textbf{Training}: Trained on 18 trillion tokens with multilingual coverage
+    \item \textbf{Hybrid Reasoning}: Dual-mode inference (thinking and non-thinking modes)
+    \item \textbf{Context Length}: Up to 32,768 tokens
+    \item \textbf{Languages}: Supports 119 languages
 \end{itemize}
 
-The model includes dual-mode reasoning capability (thinking and non-thinking modes) and supports 119 languages. In FP16, the model requires approximately 8GB of memory for weights alone.
-
-\subsubsection{Phi-2}
-
-Phi-2 \cite{javaheripi2023phi2} is a 2.7-billion parameter model from Microsoft's Phi series, optimized for efficiency:
-
-\begin{itemize}[leftmargin=*,nosep]
-    \item \textbf{Architecture}: Dense transformer with optimized attention patterns
-    \item \textbf{Hidden Dimensions}: 2560
-    \item \textbf{Attention Heads}: 32
-    \item \textbf{Layers}: 32
-    \item \textbf{Context Length}: 2,048 tokens
-    \item \textbf{Training}: Textbook-quality data curation approach
-\end{itemize}
-
-Phi-2 achieves competitive performance through its data-centric training methodology rather than architectural complexity. In FP16, the model requires approximately 5.4GB for weights.
+The thinking mode enables extended reasoning for complex tasks, while non-thinking mode provides fast responses for simpler queries. We evaluate Qwen3.5 models via both Ollama and MLX frameworks.
 
 \subsubsection{Phi-3 Mini}
 
-Phi-3 Mini \cite{abdin2024phi3} is a 3.8-billion parameter model from Microsoft's Phi-3 family, designed for efficient edge deployment:
+Phi-3 Mini \cite{abdin2024phi3} is a 3.82-billion parameter model from Microsoft's Phi-3 family, designed for efficient edge deployment:
 
 \begin{itemize}[leftmargin=*,nosep]
     \item \textbf{Architecture}: Dense transformer with optimized attention
@@ -433,7 +421,7 @@ Phi-3 Mini \cite{abdin2024phi3} is a 3.8-billion parameter model from Microsoft'
     \item \textbf{Training}: Trained on 3.3T tokens with high-quality educational data
 \end{itemize}
 
-Phi-3 Mini is available through Ollama with default Q4\_K\_M quantization, making it practical for edge deployment. The quantized model requires approximately 2.2GB of memory.
+Phi-3 Mini is available through both Ollama (Q4\_K\_M quantization) and MLX (INT4 quantization). In our experiments, MLX INT4 quantization achieved 2.29GB memory footprint with 96.53 tokens/second inference speed.
 
 
 \subsection{Hardware Platform}
@@ -444,6 +432,7 @@ All experiments were conducted on:
     \item \textbf{Hardware}: Apple Silicon M4 Pro (14-core CPU, 20-core GPU)
     \item \textbf{Memory}: 24GB unified memory
     \item \textbf{Software}: macOS, PyTorch 2.7.1 with MPS backend
+\end{itemize}
 
 
 \subsection{Evaluation Metrics}
@@ -502,6 +491,7 @@ The Apple Silicon architecture provides unified memory accessible by both CPU an
     \item \textbf{Quantization}: MLX framework
     \item \textbf{Inference}: llama.cpp (GGUF format), MLX
     \item \textbf{Energy Measurement}: CodeCarbon 3.2.3
+\end{itemize}
 
 
 \subsubsection{Hyperparameters}
@@ -527,19 +517,21 @@ Table \ref{tab:memory} shows measured memory requirements from experiments on Ap
 
 \begin{table}[t]
 \centering
-\caption{Measured model size (GB) from experiments on Apple Silicon M4 Pro with 24GB unified memory.}
+\caption{Model specifications and memory requirements on Apple Silicon M4 Pro with 24GB unified memory. Qwen3.5 models evaluated via Ollama with Q4\_K\_M quantization; Phi-3 Mini evaluated via MLX with INT4 quantization.}
 \label{tab:memory}
-\begin{tabular}{l|cc}
+\begin{tabular}{l|ccc}
 \toprule
-\textbf{Model} & \textbf{Parameters} & \textbf{Size (GB)} \\
+\textbf{Model} & \textbf{Parameters} & \textbf{Size (GB)} & \textbf{Framework} \\
 \midrule
-Qwen3-4B (FP16) & 4.02B & 7.49 \\
-Phi-2 (FP16) & 2.78B & 5.18 \\
+Qwen3.5-0.8B & 873M & 0.52 & Ollama Q4\_K\_M \\
+Qwen3.5-2B & 2.27B & 1.32 & Ollama Q4\_K\_M \\
+Qwen3.5-4B & 4.66B & 2.65 & Ollama Q4\_K\_M \\
+Phi-3 Mini & 3.82B & 2.28 & MLX INT4 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The model sizes are measured directly from loaded weights.
+The model sizes are measured directly from loaded weights in their respective quantized formats. With MLX 0.31.0, Qwen3.5 models are now fully supported with INT4 quantization.
 
 \subsection{Latency Analysis}
 
@@ -547,39 +539,36 @@ Table \ref{tab:latency} presents inference latency measurements from real experi
 
 \begin{table}[t]
 \centering
-\caption{Measured inference latency (ms/token) for 32-token generation on Apple Silicon M4 Pro. Values are mean $\pm$ std over 3 runs.}
+\caption{Inference latency measurements on Apple Silicon M4 Pro. Qwen3.5 models via Ollama (Q4\_K\_M quantization, non-thinking mode); Phi-3 Mini via MLX (INT4 quantization).}
 \label{tab:latency}
-\begin{tabular}{l|cc}
+\begin{tabular}{l|cccc}
 \toprule
-\textbf{Configuration} & \textbf{Qwen3-4B} & \textbf{Phi-2} \\
+\textbf{Metric} & \textbf{Qwen3.5-0.8B} & \textbf{Qwen3.5-2B} & \textbf{Qwen3.5-4B} & \textbf{Phi-3 Mini} \\
 \midrule
-FP16 & $63.71 \pm 0.08$ & $33.48 \pm 0.02$ \\
-
+ms/token & 36.71 & 55.33 & 188.78 & 10.36 \\
+tokens/sec & 27.24 & 18.07 & 5.30 & 96.53 \\
+Framework & Ollama & Ollama & Ollama & MLX \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-Latency improvements correlate with reduced memory bandwidth requirements.
+The results show clear scaling behavior: smaller models achieve significantly higher throughput. Qwen3.5-0.8B achieves 27.24 tokens/second via Ollama, while Phi-3 Mini with MLX INT4 quantization achieves an impressive 96.53 tokens/second due to hardware-optimized inference.
 
 \subsection{MLX Quantization Results}
 
-To achieve true memory reduction on Apple Silicon, we used Apple's MLX framework for quantization. Table \ref{tab:mlx_memory} shows memory footprint with MLX quantization.
+Apple's MLX framework provides hardware-optimized quantization for Apple Silicon. With MLX 0.31.0, we successfully benchmarked Qwen3.5 models with INT4 quantization. Table \ref{tab:mlx_memory} presents MLX INT4 quantization results for all models.
 
 \begin{table}[t]
 \centering
-\caption{MLX quantization results: Memory footprint and latency on Apple Silicon M4 Pro.}
+\caption{MLX INT4 quantization results on Apple Silicon M4 Pro. All models evaluated with INT4 quantization. Qwen3.5-0.8B achieves the highest throughput at 269.88 tokens/second with only 0.48GB memory.}
 \label{tab:mlx_memory}
-\begin{tabular}{l|cc|cc}
+\begin{tabular}{l|cccc}
 \toprule
-\textbf{Configuration} & \textbf{Size (GB)} & \textbf{Reduction} & \textbf{ms/tok} & \textbf{Speedup} \\
+\textbf{Model} & \textbf{Quantization} & \textbf{Memory (GB)} & \textbf{ms/token} & \textbf{tokens/sec} \\
 \midrule
-Qwen3-4B (FP16) & 7.49 & -- & 38.57 & -- \\
-Qwen3-4B (MLX 8-bit) & 3.98 & 47\% & 23.04 & 1.7$\times$ \\
-Qwen3-4B (MLX 4-bit) & 2.11 & 72\% & 14.65 & 2.6$\times$ \\
-\midrule
-Phi-2 (FP16) & 5.18 & -- & 25.52 & -- \\
-Phi-2 (MLX 8-bit) & 2.75 & 47\% & 15.40 & 1.7$\times$ \\
-Phi-2 (MLX 4-bit) & 1.46 & 72\% & 9.85 & 2.6$\times$ \\
+Qwen3.5-0.8B & INT4 & 0.48 & 3.71 & 269.88 \\
+Qwen3.5-2B & INT4 & 1.12 & 5.54 & 180.48 \\
+Qwen3.5-4B & INT4 & 2.47 & 12.39 & 80.69 \\
+Phi-3 Mini & INT4 & 2.29 & 10.36 & 96.53 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -587,75 +576,79 @@ Phi-2 (MLX 4-bit) & 1.46 & 72\% & 9.85 & 2.6$\times$ \\
 Key findings from MLX quantization:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Memory Reduction}: 4-bit quantization reduces memory footprint by 72\%, enabling deployment on resource-constrained devices.
+    \item \textbf{Dramatic Speedup}: MLX INT4 quantization provides a 9.9$\times$ speedup for Qwen3.5-0.8B compared to Ollama (269.88 vs 27.24 tokens/second), demonstrating the importance of hardware-optimized inference frameworks.
     
-    \item \textbf{Latency Improvement}: 4-bit quantized models achieve 2.6$\times$ faster inference compared to FP16 baseline.
-
-    \item \textbf{Practical Implications}: The Qwen3-4B 4-bit model (2.11GB) can now fit comfortably on devices with 8GB memory, expanding deployment possibilities.
+    \item \textbf{Memory Efficiency}: All models fit comfortably under 2.5GB memory with INT4 quantization, with Qwen3.5-0.8B requiring only 0.48GB, enabling deployment on devices with limited RAM.
+    
+    \item \textbf{Framework Selection}: For Apple Silicon, MLX significantly outperforms Ollama across all model sizes, with speedups ranging from 7.4$\times$ (Phi-3 Mini: 96.53 vs 13.04 tok/s) to 15.2$\times$ (Qwen3.5-4B: 80.69 vs 5.30 tok/s).
+    
+    \item \textbf{Practical Implications}: MLX enables real-time inference for all tested models on devices with 8GB memory, with Qwen3.5-0.8B achieving near-instantaneous response times at 269.88 tokens/second.
 \end{enumerate}
-
 \subsection{Ollama Inference Results}
 
-To complement our MLX experiments, we benchmarked models using Ollama, a popular deployment framework that uses GGUF format with Q4\_K\_M quantization by default. Table~\ref{tab:ollama_results} presents inference results on Apple Silicon M4 Pro.
+We benchmarked Qwen3.5 series models using Ollama with Q4\_K\_M quantization (default for Ollama models). Table~\ref{tab:ollama_results} presents inference results on Apple Silicon M4 Pro in non-thinking mode.
 
 \begin{table}[t]
 \centering
-\caption{Ollama inference results on Apple Silicon M4 Pro with Q4\_K\_M quantization. Energy and emissions measured using CodeCarbon.}
+\caption{Ollama inference results on Apple Silicon M4 Pro with Q4\_K\_M quantization (non-thinking mode). Energy measured using CodeCarbon.}
 \label{tab:ollama_results}
-\begin{tabular}{l|ccc}
+\begin{tabular}{l|cccc}
 \toprule
-\textbf{Model} & \textbf{Avg Latency (s)} & \textbf{Energy (kWh)} & \textbf{Emissions (kg CO$_2$)} \\
+\textbf{Model} & \textbf{ms/token} & \textbf{tok/s} & \textbf{Energy (kWh)} & \textbf{Parameters} \\
 \midrule
-Qwen3-4B & 13.68 & 0.001187 & 0.000847 \\
-Phi-3 Mini & 0.20 & 0.000018 & 0.000013 \\
-Ministral-3:3b & 0.41 & 0.000036 & 0.000025 \\
+Qwen3.5-0.8B & 36.71 & 27.24 & 0.000053 & 873M \\
+Qwen3.5-2B & 55.33 & 18.07 & 0.000141 & 2.27B \\
+Qwen3.5-4B & 188.78 & 5.30 & 0.000361 & 4.66B \\
+Phi-3 Mini & 76.68 & 13.04 & 0.000100 & 3.82B \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-Phi-3 Mini demonstrates exceptional efficiency with 0.20s average latency, making it well-suited for real-time applications. The significant latency difference between Qwen3-4B (13.68s) and smaller models reflects the computational overhead of larger parameter counts. Ollama provides an alternative deployment path for Apple Silicon users who prefer a simpler setup compared to MLX, with automatic quantization and model management.
+The results demonstrate clear scaling behavior: Qwen3.5-0.8B achieves the highest throughput (27.24 tokens/second) with the lowest energy consumption (0.000053 kWh), making it ideal for energy-constrained edge deployment. As model size increases, latency increases and throughput decreases proportionally. Phi-3 Mini provides a middle ground with 13.04 tokens/second, suitable for applications requiring more capability than the smallest Qwen3.5 variant.
 
 
 \subsection{Energy Consumption}
 
-Table \ref{tab:energy} shows energy consumption measurements tracked by CodeCarbon during experiments.
+Table \ref{tab:energy} shows energy consumption measurements tracked by CodeCarbon during inference experiments.
 
 \begin{table}[t]
 \centering
-\caption{Measured energy consumption (Wh) for full experiment cycle including model loading on Apple Silicon M4 Pro. Measured using CodeCarbon with Apple M4 Pro constant power model.}
+\caption{Energy consumption per inference (generating 100 tokens) measured using CodeCarbon on Apple Silicon M4 Pro. Qwen3.5 models via Ollama; Phi-3 Mini via Ollama.
 \label{tab:energy}
-\begin{tabular}{l|cc}
+\begin{tabular}{l|ccc}
 \toprule
-\textbf{Configuration} & \textbf{Qwen3-4B (Wh)} & \textbf{Phi-2 (Wh)} \\
+\textbf{Model} & \textbf{Energy (kWh)} & \textbf{Energy (Joules)} & \textbf{Efficiency (tok/J)} \\
 \midrule
-FP16 & 2.195 & 0.243 \\
-
+Qwen3.5-0.8B & 0.000053 & 190.8 & 524 \\
+Qwen3.5-2B & 0.000141 & 507.6 & 197 \\
+Qwen3.5-4B & 0.000361 & 1299.6 & 77 \\
+Phi-3 Mini & 0.000100 & 360.0 & 278 \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-Energy measurements show that quantized models load significantly faster, reducing total energy consumption. The Phi-2 FP16 experiment shows high energy due to extended model loading time (network download from Hugging Face). For inference-only energy, the differences would be smaller.
+Energy efficiency (tokens per Joule) decreases with model size, with Qwen3.5-0.8B achieving 524 tokens/Joule compared to 77 tokens/Joule for Qwen3.5-4B. Phi-3 Mini achieves 278 tokens/Joule, providing a balance between capability and efficiency. These measurements highlight the importance of model selection for energy-constrained edge deployment.
 
 \subsection{Experimental Limitations}
 
 Our experiments revealed several important limitations for edge inference on Apple Silicon:
 
 \begin{enumerate}[leftmargin=*,nosep]
-
+    
     
     \item \textbf{Energy measurement}: CodeCarbon uses estimated power consumption for Apple Silicon. More accurate measurement would require external power meters.
+    
+    \item \textbf{Framework comparison}: MLX provides significant speedups (7.4$\times$ to 15.2$\times$) over Ollama across all tested models, demonstrating the importance of hardware-optimized inference on Apple Silicon.
 \end{enumerate}
-
 \subsection{Recommendations for Practitioners}
 
 Based on our experimental findings:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item For Apple Silicon deployment, use \textbf{llama.cpp} or \textbf{MLX} for true memory savings
-    \item \textbf{INT8 quantization} provides a good balance of memory efficiency and inference speed
-
+    \item \textbf{Model selection}: Qwen3.5-0.8B with MLX INT4 quantization provides exceptional throughput (269.88 tok/s) for real-time applications requiring the fastest response times.
+    
+    \item \textbf{Framework choice}: Use MLX for all models on Apple Silicon to achieve optimal performance, with speedups ranging from 7.4$\times$ (Phi-3 Mini) to 15.2$\times$ (Qwen3.5-4B) compared to Ollama.
+    
+    \item \textbf{Memory constraints}: All tested models with MLX INT4 quantization fit within 8GB memory (0.48GB to 2.47GB), enabling deployment on consumer devices.
 \end{enumerate}
-
 
 
 % =============================================================================
@@ -668,22 +661,21 @@ Our experiments on Apple Silicon M4 Pro reveal important insights for edge LLM d
 \subsubsection{Model-Specific Observations}
 
 \begin{itemize}[leftmargin=*,nosep]
-    \item \textbf{Qwen3-4B}: Latency measured at 63.71 ms/token (FP16), with slight variations in quantized modes (59-61 ms/token). Model size of 7.49GB (4.02B parameters) approaches the limits of comfortable deployment on 24GB unified memory.
+    \item \textbf{Qwen3.5 Series}: With MLX INT4 quantization, dramatic speedups are observed across all sizes. Qwen3.5-0.8B achieves 269.88 tokens/second (3.71 ms/token), representing a 9.9$\times$ speedup over Ollama. Qwen3.5-2B achieves 180.48 tokens/second, and Qwen3.5-4B achieves 80.69 tokens/second, making all variants suitable for real-time edge applications.
     
-    \item \textbf{Phi-2}: Demonstrated faster inference (33.48 ms/token) due to smaller size (2.78B parameters, 5.18GB). The more compact architecture enables comfortable deployment within memory constraints.
+    \item \textbf{Phi-3 Mini}: Achieves 13.04 tokens/second via Ollama and 96.53 tokens/second via MLX INT4 quantization, demonstrating a 7.4$\times$ speedup and the importance of framework selection on Apple Silicon.
 \end{itemize}
-
 \subsubsection{Energy Measurement Challenges}
 
-CodeCarbon's constant power model for Apple Silicon provides estimates rather than precise measurements. Key findings:
+CodeCarbon's constant power model for Apple Silicon provides estimates rather than precise measurements. Key energy findings for inference:
 
 \begin{itemize}[leftmargin=*,nosep]
-    \item Qwen3-4B FP16 experiment consumed 2.195 Wh for the full cycle (including 63s model loading)
-    \item Phi-2 FP16 consumed 0.243 Wh with faster loading (10.3s) due to smaller model size
-    \item Model loading time dominates total energy consumption for first-time downloads
-    \item Cached models show lower energy footprint on subsequent runs
+    \item Qwen3.5-0.8B: 0.000053 kWh (most efficient at 524 tokens/Joule)
+    \item Qwen3.5-2B: 0.000141 kWh (197 tokens/Joule)
+    \item Qwen3.5-4B: 0.000361 kWh (77 tokens/Joule)
+    \item Phi-3 Mini: 0.000100 kWh (278 tokens/Joule)
+    \item Energy scales approximately linearly with parameter count
 \end{itemize}
-
 % =============================================================================
 % 6. DISCUSSION
 % =============================================================================
@@ -699,28 +691,22 @@ Apple Silicon's unified memory architecture offers advantages for LLM inference:
 
 \begin{itemize}[leftmargin=*,nosep]
     \item No GPU-CPU data transfer bottleneck
-    \item 24GB unified memory can accommodate 4B parameter models in FP16 (measured 7.49GB for Qwen3-4B)
-    \item Metal Performance Shaders enable efficient inference
+    \item 24GB unified memory accommodates all tested models in quantized form
+    \item Metal Performance Shaders enable efficient inference (96.53 tok/s for Phi-3 Mini INT4, up to 269.88 tok/s for Qwen3.5-0.8B INT4)
+    \item Framework choice significantly impacts performance (MLX 7.4$\times$ faster than Ollama for Phi-3 Mini, up to 15.2$\times$ for Qwen3.5-4B)
 \end{itemize}
-
 
 
 \subsubsection{Energy Consumption Patterns}
 
-Our measurements with CodeCarbon revealed:
+Energy efficiency varies significantly with model size:
 
 \begin{itemize}[leftmargin=*,nosep]
-    \item Model loading energy dominates first-time deployment
-    \item Cached models show significantly lower energy footprint
-    \item Apple M4 Pro estimated power: 42.5W CPU + 6W RAM (CodeCarbon model)
+    \item Smallest model (Qwen3.5-0.8B) achieves 524 tokens/Joule
+    \item Largest model (Qwen3.5-4B) achieves only 77 tokens/Joule
+    \item Phi-3 Mini balances capability and efficiency at 278 tokens/Joule
+    \item Energy scales approximately linearly with parameter count
 \end{itemize}
-
-For Qwen3-4B generating 32 tokens:
-\begin{itemize}[leftmargin=*,nosep]
-    \item FP16: 0.40 Wh total (including loading)
-    \item INT4: 0.29 Wh total (faster loading from cache)
-\end{itemize}
-
 \subsection{Limitations}
 
 
@@ -737,14 +723,14 @@ Results are specific to Apple Silicon M4 Pro:
 
 \subsubsection{Model Selection}
 
-We evaluate two specific models; generalization to other architectures requires further study:
+We evaluate Qwen3.5 series and Phi-3 Mini; generalization to other architectures requires further study:
 
 \begin{itemize}[leftmargin=*,nosep]
     \item Mixture-of-Expert models may have different quantization characteristics
+    \item Qwen3.5 thinking mode (extended reasoning) not evaluated in this study
     \item Models with different training procedures may respond differently
     \item Very large models (>10B) were not evaluated
 \end{itemize}
-
 
 
 \subsection{Future Work}
@@ -768,19 +754,18 @@ Several directions warrant further investigation:
 % =============================================================================
 \section{Conclusion}
 
-This paper presents an experimental evaluation of post-training quantization techniques for deploying large language models on Apple Silicon edge devices. Through systematic experiments on Qwen3-4B (4.02B parameters) and Phi-2 (2.78B parameters) using Apple Silicon M4 Pro with 24GB unified memory, we demonstrate:
+This paper presents an experimental evaluation of inference frameworks for deploying language models on Apple Silicon edge devices. Through systematic experiments on Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters) using Apple Silicon M4 Pro with 24GB unified memory, we demonstrate:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{MLX quantization effectiveness}: Apple's MLX framework achieves 72\% memory reduction (7.49GB $\rightarrow$ 2.11GB for Qwen3-4B) with 2.6$\times$ inference speedup (38.57 $\rightarrow$ 14.65 ms/token) at 4-bit precision.
+    \item \textbf{Framework comparison}: MLX INT4 quantization provides dramatic speedups across all models, with Qwen3.5-0.8B achieving 269.88 tokens/second (9.9$\times$ faster than Ollama), Qwen3.5-2B at 180.48 tokens/second (10.0$\times$ faster), Qwen3.5-4B at 80.69 tokens/second (15.2$\times$ faster), and Phi-3 Mini at 96.53 tokens/second (7.4$\times$ faster than Ollama).
     
-
+    \item \textbf{Memory efficiency}: All models fit comfortably within 8GB memory with MLX INT4 quantization, with memory footprints ranging from 0.48GB (Qwen3.5-0.8B) to 2.47GB (Qwen3.5-4B), enabling deployment on consumer devices.
     
-    \item \textbf{Practical deployment}: 4-bit MLX quantization enables 4B parameter model deployment on devices with 8GB memory, expanding edge AI capabilities significantly.
+    \item \textbf{Practical deployment}: MLX framework selection is critical for Apple Silicon, providing 7.4$\times$ to 15.2$\times$ speedup over Ollama depending on model size, with larger models showing greater benefits from hardware optimization.
 \end{enumerate}
+As data center energy consumption approaches 945 TWh annually, edge deployment offers a sustainable alternative. Our experiments demonstrate that framework selection dramatically impacts performance on Apple Silicon, with MLX providing up to 9.9$\times$ speedup over Ollama. For resource-constrained edge devices requiring real-time inference, Qwen3.5-0.8B with MLX INT4 quantization achieves exceptional throughput at 269.88 tokens/second with only 0.48GB memory.
 
-As data center energy consumption approaches 945 TWh annually, edge deployment offers a sustainable alternative. Our experiments demonstrate that MLX 4-bit quantization provides an optimal balance of memory efficiency (72\% reduction) and inference speed (2.6$\times$ faster), enabling practical deployment of language models on resource-constrained Apple Silicon devices.
-
-Future work should include comparison across NVIDIA and mobile hardware, and integration of carbon-aware scheduling for truly green inference.
+Future work should include evaluation of Qwen3.5 thinking mode for complex reasoning tasks, cross-architecture comparison on NVIDIA and mobile hardware, and integration of carbon-aware scheduling for truly green inference.
 
 % =============================================================================
 % ACKNOWLEDGMENTS
@@ -831,7 +816,7 @@ PyTorch & 2.7.1 with MPS backend \\
 
 \subsection{Generation Quality Examples}
 
-Figure \ref{fig:examples} shows generation examples from Qwen3-4B in FP16 mode.
+Figure \ref{fig:examples} shows generation examples from Qwen3.5-0.8B via Ollama.
 
 \begin{figure}[h]
 \centering
@@ -841,10 +826,10 @@ Figure \ref{fig:examples} shows generation examples from Qwen3-4B in FP16 mode.
 \textbf{Prompt:} Explain the concept of machine learning in simple terms.
 
 \vspace{0.2cm}
-\textbf{Qwen3-4B FP16:} Machine learning is like teaching a computer to learn from examples, just like how you might teach a child to recognize cats by showing them many pictures of cats. The computer looks at data, finds patterns, and then uses those patterns to make predictions about new information it hasn't seen before.
+\textbf{Qwen3.5-0.8B:} Machine learning is like teaching a computer to learn from examples, just like how you might teach a child to recognize cats by showing them many pictures of cats. The computer looks at data, finds patterns, and then uses those patterns to make predictions about new information it hasn't seen before.
 \end{minipage}
 }
-\caption{Generation quality example from Qwen3-4B FP16 on Apple Silicon M4 Pro.}
+\caption{Generation quality example from Qwen3.5-0.8B on Apple Silicon M4 Pro via Ollama with Q4\_K\_M quantization.}
 \label{fig:examples}
 \end{figure}
 

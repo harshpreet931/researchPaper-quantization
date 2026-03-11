@@ -1,0 +1,58 @@
+[
+  {
+    "model": "Qwen3.5-0.8B",
+    "quant": "INT4",
+    "path": "mlx-community/Qwen3.5-0.8B-4bit",
+    "time_s": 2.48,
+    "gen_tokens": 100,
+    "tokens_per_sec": 269.88,
+    "ms_per_token": 3.71,
+    "prompt_tps": 413.42,
+    "peak_memory_gb": 0.477
+  },
+  {
+    "model": "Qwen3.5-2B",
+    "quant": "INT4",
+    "path": "mlx-community/Qwen3.5-2B-4bit",
+    "time_s": 97.38,
+    "gen_tokens": 92,
+    "tokens_per_sec": 180.48,
+    "ms_per_token": 5.54,
+    "prompt_tps": 217.12,
+    "peak_memory_gb": 1.121
+  },
+  {
+    "model": "Qwen3.5-4B",
+    "quant": "INT4",
+    "path": "mlx-community/Qwen3.5-4B-4bit",
+    "time_s": 218.67,
+    "gen_tokens": 100,
+    "tokens_per_sec": 80.69,
+    "ms_per_token": 12.39,
+    "prompt_tps": 59.24,
+    "peak_memory_gb": 2.473
+  },
+  {
+    "model": "Qwen3.5-0.8B",
+    "quant": "FP16",
+    "path": "Qwen/Qwen3.5-0.8B",
+    "time_s": 124.01,
+    "gen_tokens": 100,
+    "tokens_per_sec": 134.53,
+    "ms_per_token": 7.43,
+    "prompt_tps": 77.11,
+    "peak_memory_gb": 1.577
+  },
+  {
+    "model": "Qwen3.5-2B",
+    "quant": "FP16",
+    "path": "Qwen/Qwen3.5-2B",
+    "error": "timeout"
+  },
+  {
+    "model": "Qwen3.5-4B",
+    "quant": "FP16",
+    "path": "Qwen/Qwen3.5-4B",
+    "error": "timeout"
+  }
+]

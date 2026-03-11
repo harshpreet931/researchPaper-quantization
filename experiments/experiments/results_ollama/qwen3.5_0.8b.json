@@ -1,0 +1,18 @@
+{
+  "model": "qwen3.5:0.8b",
+  "timestamp": "2026-03-11T15:40:33.050875",
+  "num_iterations": 3,
+  "prompt_length_chars": 43,
+  "avg_latency_seconds": 1.30947,
+  "ms_per_token": 36.71,
+  "tokens_per_second": 27.24,
+  "avg_tokens_generated": 35.7,
+  "successful_iterations": 3,
+  "total_iterations": 3,
+  "energy_consumed_kwh": 5.3e-05,
+  "emissions_kg": 3.8e-05,
+  "status": "success",
+  "min_latency_seconds": 1.029018,
+  "max_latency_seconds": 1.723292,
+  "std_latency_seconds": 0.298713
+}

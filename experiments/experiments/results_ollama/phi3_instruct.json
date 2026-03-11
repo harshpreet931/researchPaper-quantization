@@ -1,0 +1,18 @@
+{
+  "model": "phi3:instruct",
+  "timestamp": "2026-03-11T15:41:33.666749",
+  "num_iterations": 3,
+  "prompt_length_chars": 43,
+  "avg_latency_seconds": 2.479397,
+  "ms_per_token": 76.68,
+  "tokens_per_second": 13.04,
+  "avg_tokens_generated": 32.3,
+  "successful_iterations": 3,
+  "total_iterations": 3,
+  "energy_consumed_kwh": 0.0001,
+  "emissions_kg": 7.1e-05,
+  "status": "success",
+  "min_latency_seconds": 2.03027,
+  "max_latency_seconds": 3.347106,
+  "std_latency_seconds": 0.613689
+}
