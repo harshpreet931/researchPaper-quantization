@@ -420,6 +420,21 @@ Phi-2 \cite{javaheripi2023phi2} is a 2.7-billion parameter model from Microsoft'
 
 Phi-2 achieves competitive performance through its data-centric training methodology rather than architectural complexity. In FP16, the model requires approximately 5.4GB for weights.
 
+\subsubsection{Phi-3 Mini}
+
+Phi-3 Mini \cite{abdin2024phi3} is a 3.8-billion parameter model from Microsoft's Phi-3 family, designed for efficient edge deployment:
+
+\begin{itemize}[leftmargin=*,nosep]
+    \item \textbf{Architecture}: Dense transformer with optimized attention
+    \item \textbf{Hidden Dimensions}: 3072
+    \item \textbf{Attention Heads}: 32
+    \item \textbf{Layers}: 32
+    \item \textbf{Context Length}: 128,000 tokens (with RoPE)
+    \item \textbf{Training}: Trained on 3.3T tokens with high-quality educational data
+\end{itemize}
+
+Phi-3 Mini is available through Ollama with default Q4\_K\_M quantization, making it practical for edge deployment. The quantized model requires approximately 2.2GB of memory.
+
 
 \subsection{Hardware Platform}
 
@@ -578,6 +593,28 @@ Key findings from MLX quantization:
 
     \item \textbf{Practical Implications}: The Qwen3-4B 4-bit model (2.11GB) can now fit comfortably on devices with 8GB memory, expanding deployment possibilities.
 \end{enumerate}
+
+\subsection{Ollama Inference Results}
+
+To complement our MLX experiments, we benchmarked models using Ollama, a popular deployment framework that uses GGUF format with Q4\_K\_M quantization by default. Table~\ref{tab:ollama_results} presents inference results on Apple Silicon M4 Pro.
+
+\begin{table}[t]
+\centering
+\caption{Ollama inference results on Apple Silicon M4 Pro with Q4\_K\_M quantization. Energy and emissions measured using CodeCarbon.}
+\label{tab:ollama_results}
+\begin{tabular}{l|ccc}
+\toprule
+\textbf{Model} & \textbf{Avg Latency (s)} & \textbf{Energy (kWh)} & \textbf{Emissions (kg CO$_2$)} \\
+\midrule
+Qwen3-4B & 13.68 & 0.001187 & 0.000847 \\
+Phi-3 Mini & 0.20 & 0.000018 & 0.000013 \\
+Ministral-3:3b & 0.41 & 0.000036 & 0.000025 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Phi-3 Mini demonstrates exceptional efficiency with 0.20s average latency, making it well-suited for real-time applications. The significant latency difference between Qwen3-4B (13.68s) and smaller models reflects the computational overhead of larger parameter counts. Ollama provides an alternative deployment path for Apple Silicon users who prefer a simpler setup compared to MLX, with automatic quantization and model management.
+
 
 \subsection{Energy Consumption}
 
