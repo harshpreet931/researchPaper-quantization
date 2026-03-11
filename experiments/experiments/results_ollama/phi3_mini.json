@@ -1,0 +1,18 @@
+{
+  "model": "phi3:mini",
+  "timestamp": "2026-03-11T09:55:06.450598",
+  "num_iterations": 5,
+  "prompt_length_chars": 43,
+  "avg_latency_seconds": 26.804861,
+  "ms_per_token": 166.62,
+  "tokens_per_second": 6.0,
+  "avg_tokens_generated": 160.9,
+  "successful_iterations": 4,
+  "total_iterations": 5,
+  "energy_consumed_kwh": 0,
+  "emissions_kg": 0,
+  "status": "success",
+  "min_latency_seconds": 6.578185,
+  "max_latency_seconds": 52.025957,
+  "std_latency_seconds": 18.777629
+}
