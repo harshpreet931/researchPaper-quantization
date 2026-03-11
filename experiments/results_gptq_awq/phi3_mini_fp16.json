@@ -1,0 +1,12 @@
+{
+  "model": "Phi-3-Mini",
+  "quant_method": "fp16",
+  "timestamp": "2026-03-11T10:37:38.778317",
+  "load_time_seconds": 4.730008125305176,
+  "parameters": 3821079552,
+  "model_size_gb": 7.117315292358398,
+  "avg_latency_seconds": 1.1099778470000004,
+  "ms_per_token": 34.68680771875001,
+  "tokens_per_second": 28.82940419620824,
+  "status": "success"
+}
