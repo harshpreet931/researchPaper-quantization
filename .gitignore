@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+
+# IDE/Tool state
+.sisyphus/
+
+# Model artifacts (large files)
+*.safetensors
+*.bin
+*.gguf
