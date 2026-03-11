@@ -1,0 +1,12 @@
+{
+  "model": "qwen3:4b",
+  "timestamp": "2026-03-11T10:06:00.602231",
+  "avg_latency_seconds": 13.6776,
+  "min_latency_seconds": 10.3395,
+  "max_latency_seconds": 16.7874,
+  "successful_iterations": 5,
+  "total_iterations": 5,
+  "energy_consumed_kwh": 0.001187,
+  "emissions_kg": 0.000847,
+  "status": "success"
+}

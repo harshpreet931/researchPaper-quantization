@@ -1,0 +1,12 @@
+{
+  "model": "ministral-3:3b",
+  "timestamp": "2026-03-11T10:06:11.081696",
+  "avg_latency_seconds": 0.4102,
+  "min_latency_seconds": 0.3572,
+  "max_latency_seconds": 0.4678,
+  "successful_iterations": 5,
+  "total_iterations": 5,
+  "energy_consumed_kwh": 3.6e-05,
+  "emissions_kg": 2.5e-05,
+  "status": "success"
+}

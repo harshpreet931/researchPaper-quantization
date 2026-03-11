@@ -1,0 +1,38 @@
+[
+  {
+    "model": "qwen3:4b",
+    "timestamp": "2026-03-11T10:06:00.602231",
+    "avg_latency_seconds": 13.6776,
+    "min_latency_seconds": 10.3395,
+    "max_latency_seconds": 16.7874,
+    "successful_iterations": 5,
+    "total_iterations": 5,
+    "energy_consumed_kwh": 0.001187,
+    "emissions_kg": 0.000847,
+    "status": "success"
+  },
+  {
+    "model": "phi3:mini",
+    "timestamp": "2026-03-11T10:06:06.678256",
+    "avg_latency_seconds": 0.2033,
+    "min_latency_seconds": 0.1773,
+    "max_latency_seconds": 0.24,
+    "successful_iterations": 5,
+    "total_iterations": 5,
+    "energy_consumed_kwh": 1.8e-05,
+    "emissions_kg": 1.3e-05,
+    "status": "success"
+  },
+  {
+    "model": "ministral-3:3b",
+    "timestamp": "2026-03-11T10:06:11.081696",
+    "avg_latency_seconds": 0.4102,
+    "min_latency_seconds": 0.3572,
+    "max_latency_seconds": 0.4678,
+    "successful_iterations": 5,
+    "total_iterations": 5,
+    "energy_consumed_kwh": 3.6e-05,
+    "emissions_kg": 2.5e-05,
+    "status": "success"
+  }
+]

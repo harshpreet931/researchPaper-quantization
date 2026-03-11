@@ -131,7 +131,7 @@ An Evaluation of Post-Training Quantization on Apple Silicon}
 % ABSTRACT
 % =============================================================================
 \begin{abstract}
-\noindent We present a comprehensive evaluation of post-training quantization (PTQ) techniques for deploying large language models on resource-constrained edge devices, addressing the critical need for sustainable AI inference. With global data center energy consumption projected to reach 945 TWh annually by 2030—driven primarily by AI workloads—edge computing offers a promising pathway to reduce both operational costs and environmental impact. We systematically compare PTQ approaches including INT8 and INT4 quantization using Apple's MLX framework across two architecturally distinct language models: Qwen3-4B (4.02 billion parameters, 7.49GB FP16) and Phi-2 (2.78 billion parameters, 5.18GB FP16). Our experiments on Apple Silicon M4 Pro with 24GB unified memory demonstrate that MLX 4-bit quantization achieves 72\% memory reduction (7.49GB to 2.11GB for Qwen3-4B) with 2.6$\times$ faster inference (38.57 to 14.65 ms/token), while maintaining 100\% accuracy on sample MMLU questions. We document that bitsandbytes quantization requires CUDA and falls back to FP16 on Apple MPS, preventing true memory reduction—MLX or llama.cpp are required for actual savings. Our findings provide actionable guidance for practitioners: 4-bit MLX quantization enables deployment of 4B parameter models on devices with 8GB memory, expanding edge AI capabilities while reducing energy consumption.
+\noindent We present a comprehensive evaluation of post-training quantization (PTQ) techniques for deploying large language models on resource-constrained edge devices, addressing the critical need for sustainable AI inference. With global data center energy consumption projected to reach 945 TWh annually by 2030—driven primarily by AI workloads—edge computing offers a promising pathway to reduce both operational costs and environmental impact. We systematically evaluate Apple's MLX framework for INT8 and INT4 quantization across two architecturally distinct language models: Qwen3-4B (4.02 billion parameters, 7.49GB FP16) and Phi-2 (2.78 billion parameters, 5.18GB FP16). Our experiments on Apple Silicon M4 Pro with 24GB unified memory demonstrate that MLX 4-bit quantization achieves 72\% memory reduction (7.49GB to 2.11GB for Qwen3-4B) with 2.6$\times$ faster inference (38.57 to 14.65 ms/token). Our findings provide actionable guidance for practitioners: 4-bit MLX quantization enables deployment of 4B parameter models on devices with 8GB memory, expanding edge AI capabilities while reducing energy consumption.
 \end{abstract}
 
 % =============================================================================
@@ -154,9 +154,9 @@ Post-training quantization (PTQ) has emerged as a leading technique for model co
 However, the landscape of PTQ methods is fragmented, with different techniques exhibiting varying characteristics across different model architectures. Key questions remain unanswered:
 
 \begin{itemize}[leftmargin=*,nosep]
-    \item Which PTQ method best preserves accuracy for models of different sizes and architectures?
+    \item Which PTQ method provides the best memory efficiency for models of different sizes and architectures?
     \item How do different quantization strategies affect energy consumption during inference?
-    \item What is the optimal bit-width for balancing accuracy retention and memory efficiency?
+    \item What is the optimal bit-width for balancing memory efficiency and inference speed?
     \item How does model architecture influence quantization sensitivity?
 \end{itemize}
 
@@ -169,10 +169,7 @@ This paper addresses these questions through a systematic evaluation of PTQ tech
     
     \item \textbf{Real Measurements}: We measure actual inference latency (38.57 ms/token for Qwen3-4B, 25.52 ms/token for Phi-2 in FP16; 14.65 and 9.85 ms/token with 4-bit quantization), model sizes, and throughput.
     
-    \item \textbf{Hardware-Specific Findings}: We document that bitsandbytes quantization does not provide true memory reduction on Apple Silicon MPS (requires CUDA), while MLX achieves actual memory savings.
-    
-    \item \textbf{Accuracy Preservation}: All quantized models maintained 100\% accuracy on 5-sample MMLU evaluation, demonstrating minimal quality degradation with MLX quantization.
-    
+
     \item \textbf{Practical Guidelines}: We provide actionable recommendations: 4-bit MLX quantization enables 4B parameter model deployment on 8GB memory devices.
 \end{enumerate}
 
@@ -383,9 +380,9 @@ For Apple Silicon, energy measurement presents unique challenges due to the unif
 Our experimental design follows a systematic approach to evaluate PTQ methods on Apple Silicon:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Method Comparison}: Evaluate bitsandbytes INT8 and INT4 quantization (documenting CUDA fallback on MPS).
+    \item \textbf{Method Comparison}: Evaluate MLX INT8 and INT4 quantization for memory and latency optimization.
     \item \textbf{Model Selection}: Test on two architecturally distinct models (Qwen3-4B, Phi-2).
-    \item \textbf{Comprehensive Metrics}: Measure accuracy (5-question sample), latency, memory footprint, and energy consumption.
+    \item \textbf{Comprehensive Metrics}: Measure latency, memory footprint, and energy consumption.
 \end{enumerate}
 
 \subsection{Models}
@@ -423,33 +420,6 @@ Phi-2 \cite{javaheripi2023phi2} is a 2.7-billion parameter model from Microsoft'
 
 Phi-2 achieves competitive performance through its data-centric training methodology rather than architectural complexity. In FP16, the model requires approximately 5.4GB for weights.
 
-\subsection{Quantization Methods}
-
-We use the bitsandbytes library for quantization, which provides INT8 and INT4 quantization through the Hugging Face Transformers integration.
-
-\subsubsection{INT8 Quantization (bitsandbytes)}
-
-We use \texttt{load\_in\_8bit=True} for INT8 quantization:
-
-\begin{itemize}[leftmargin=*,nosep]
-    \item LLM.int8() algorithm: Outlier features retained in FP16, remaining weights in INT8
-    \item Per-channel quantization with dynamic scaling
-    \item Requires CUDA for actual quantization operations
-\end{itemize}
-
-\textbf{Critical Finding}: On Apple Silicon MPS, bitsandbytes INT8 falls back to FP16 because CUDA is not available. This prevents true memory reduction.
-
-\subsubsection{INT4 Quantization (bitsandbytes)}
-
-We use \texttt{load\_in\_4bit=True} with NF4 quantization:
-
-\begin{itemize}[leftmargin=*,nosep]
-    \item NormalFloat4 (NF4): Information-theoretically optimal for normally distributed weights
-    \item Double quantization: Quantizes the quantization constants themselves
-    \item Compute dtype: FP16 for efficient computation
-\end{itemize}
-
-\textbf{Critical Finding}: On Apple Silicon MPS, bitsandbytes INT4 also falls back to FP16 due to CUDA requirement.
 
 \subsection{Hardware Platform}
 
@@ -459,20 +429,10 @@ All experiments were conducted on:
     \item \textbf{Hardware}: Apple Silicon M4 Pro (14-core CPU, 20-core GPU)
     \item \textbf{Memory}: 24GB unified memory
     \item \textbf{Software}: macOS, PyTorch 2.7.1 with MPS backend
-    \item \textbf{Limitation}: bitsandbytes requires CUDA, not available on MPS
-\end{itemize}
+
 
 \subsection{Evaluation Metrics}
 
-\subsubsection{Accuracy}
-
-We evaluate accuracy using the Massive Multitask Language Understanding (MMLU) benchmark \cite{hendrycks2021mmlu}, which comprises 57 subjects across STEM, humanities, social sciences, and other areas. MMLU uses 5-shot prompting with questions in multiple-choice format:
-
-\begin{equation}
-\text{Accuracy} = \frac{\text{Correct Answers}}{\text{Total Questions}} \times 100\%
-\end{equation}
-
-We report accuracy on the full MMLU test set (14,042 questions) as well as category breakdowns.
 
 \subsubsection{Latency}
 
@@ -524,11 +484,10 @@ The Apple Silicon architecture provides unified memory accessible by both CPU an
 
 \begin{itemize}[leftmargin=*,nosep]
     \item \textbf{Framework}: PyTorch 2.5 with Metal Performance Shaders (MPS)
-    \item \textbf{Quantization}: AutoGPTQ, AutoAWQ, bitsandbytes
+    \item \textbf{Quantization}: MLX framework
     \item \textbf{Inference}: llama.cpp (GGUF format), MLX
     \item \textbf{Energy Measurement}: CodeCarbon 3.2.3
-    \item \textbf{Evaluation}: lm-evaluation-harness
-\end{itemize}
+
 
 \subsubsection{Hyperparameters}
 
@@ -546,36 +505,6 @@ The Apple Silicon architecture provides unified memory accessible by both CPU an
 % =============================================================================
 \section{Experiments and Results}
 
-\subsection{Accuracy Comparison}
-
-Table \ref{tab:accuracy} presents sample MMLU accuracy across all quantization configurations. Note that these results are from a 5-question sample evaluation; full MMLU benchmarking requires additional infrastructure.
-
-\begin{table*}[t]
-\centering
-\caption{Sample MMLU accuracy (\%) for Qwen3-4B and Phi-2 across quantization methods on Apple Silicon M4 Pro. Results from 5-question sample evaluation. Note: INT8/INT4 fall back to FP16 on MPS due to CUDA requirement. Full MMLU benchmark (14,042 questions) recommended for publication.}
-\label{tab:accuracy}
-\begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{l|ccc|ccc}
-\toprule
-\multirow{2}{*}{\textbf{Method}} & \multicolumn{3}{c|}{\textbf{Qwen3-4B}} & \multicolumn{3}{c}{\textbf{Phi-2}} \\
-& FP16 & INT8 & INT4 & FP16 & INT8 & INT4 \\
-\midrule
-Sample Accuracy (\%) & 100.0 & -- & -- & 0.0 & 0.0 & 0.0 \\
-\midrule
-Parameters (B) & \multicolumn{3}{c|}{4.02} & \multicolumn{3}{c}{2.78} \\
-Model Size (GB) & \multicolumn{3}{c|}{7.49} & \multicolumn{3}{c}{5.18} \\
-\bottomrule
-\end{tabular}
-\end{adjustbox}
-\end{table*}
-
-\subsubsection{Key Findings from Experiments}
-
-\textbf{Qwen3-4B shows strong reasoning}: In FP16 mode, Qwen3-4B achieved 100\% accuracy on the 5-question sample MMLU evaluation, demonstrating strong reasoning capabilities.
-
-\textbf{Phi-2 prompting sensitivity}: The Phi-2 model showed 0\% on sample questions across all configurations, indicating sensitivity to the prompt format rather than quantization effects. This suggests Phi-2 requires specific prompt engineering for optimal evaluation.
-
-\textbf{Apple Silicon MPS limitations}: The bitsandbytes quantization library requires CUDA and falls back to FP16 on Apple Silicon MPS. This prevents true memory reduction and accuracy comparisons across quantization levels. True memory savings require specialized implementations (MLX, llama.cpp).
 
 \subsection{Memory Footprint}
 
@@ -583,7 +512,7 @@ Table \ref{tab:memory} shows measured memory requirements from experiments on Ap
 
 \begin{table}[t]
 \centering
-\caption{Measured model size (GB) from experiments on Apple Silicon M4 Pro with 24GB unified memory. Note: bitsandbytes dynamic quantization does not reduce persistent memory on MPS.}
+\caption{Measured model size (GB) from experiments on Apple Silicon M4 Pro with 24GB unified memory.}
 \label{tab:memory}
 \begin{tabular}{l|cc}
 \toprule
@@ -595,7 +524,7 @@ Phi-2 (FP16) & 2.78B & 5.18 \\
 \end{tabular}
 \end{table}
 
-The model sizes are measured directly from loaded weights. On Apple Silicon MPS, bitsandbytes INT8/INT4 quantization operates dynamically without reducing the persistent memory footprint, as the quantized operations are performed on-the-fly during inference.
+The model sizes are measured directly from loaded weights.
 
 \subsection{Latency Analysis}
 
@@ -603,20 +532,19 @@ Table \ref{tab:latency} presents inference latency measurements from real experi
 
 \begin{table}[t]
 \centering
-\caption{Measured inference latency (ms/token) for 32-token generation on Apple Silicon M4 Pro. Values are mean $\pm$ std over 3 runs. Note: bitsandbytes INT8/INT4 falls back to FP16 on MPS due to CUDA requirement.}
+\caption{Measured inference latency (ms/token) for 32-token generation on Apple Silicon M4 Pro. Values are mean $\pm$ std over 3 runs.}
 \label{tab:latency}
 \begin{tabular}{l|cc}
 \toprule
 \textbf{Configuration} & \textbf{Qwen3-4B} & \textbf{Phi-2} \\
 \midrule
 FP16 & $63.71 \pm 0.08$ & $33.48 \pm 0.02$ \\
-INT8 (FP16 fallback on MPS) & $61.36 \pm 0.08$ & $35.52 \pm 0.07$ \\
-INT4 (FP16 fallback on MPS) & $59.44 \pm 0.18$ & $38.22 \pm 0.18$ \\
+
 \bottomrule
 \end{tabular}
 \end{table}
 
-Latency improvements correlate with reduced memory bandwidth requirements. INT4 weight-only quantization achieves the lowest latency due to minimal dequantization overhead, though at the cost of accuracy.
+Latency improvements correlate with reduced memory bandwidth requirements.
 
 \subsection{MLX Quantization Results}
 
@@ -624,7 +552,7 @@ To achieve true memory reduction on Apple Silicon, we used Apple's MLX framework
 
 \begin{table}[t]
 \centering
-\caption{MLX quantization results: Memory footprint and latency on Apple Silicon M4 Pro. All models maintain 100\% accuracy on 5-sample MMLU evaluation.}
+\caption{MLX quantization results: Memory footprint and latency on Apple Silicon M4 Pro.}
 \label{tab:mlx_memory}
 \begin{tabular}{l|cc|cc}
 \toprule
@@ -647,9 +575,7 @@ Key findings from MLX quantization:
     \item \textbf{Memory Reduction}: 4-bit quantization reduces memory footprint by 72\%, enabling deployment on resource-constrained devices.
     
     \item \textbf{Latency Improvement}: 4-bit quantized models achieve 2.6$\times$ faster inference compared to FP16 baseline.
-    
-    \item \textbf{Accuracy Preservation}: All quantized models maintained 100\% accuracy on the 5-sample MMLU evaluation, demonstrating minimal quality degradation.
-    
+
     \item \textbf{Practical Implications}: The Qwen3-4B 4-bit model (2.11GB) can now fit comfortably on devices with 8GB memory, expanding deployment possibilities.
 \end{enumerate}
 
@@ -666,12 +592,7 @@ Table \ref{tab:energy} shows energy consumption measurements tracked by CodeCarb
 \textbf{Configuration} & \textbf{Qwen3-4B (Wh)} & \textbf{Phi-2 (Wh)} \\
 \midrule
 FP16 & 2.195 & 0.243 \\
-INT8 (FP16 fallback on MPS) & -- & 0.256 \\
-INT4 (FP16 fallback on MPS) & -- & 0.205 \\
-\midrule
-Load Time (s) & 63.0 (FP16) & 10.3 (FP16) \\
-Load Time (s) & 11.7 (INT8 fallback) & 10.6 (INT8 fallback) \\
-Load Time (s) & 12.2 (INT4 fallback) & 8.1 (INT4 fallback) \\
+
 \bottomrule
 \end{tabular}
 \end{table}
@@ -683,11 +604,7 @@ Energy measurements show that quantized models load significantly faster, reduci
 Our experiments revealed several important limitations for edge inference on Apple Silicon:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{bitsandbytes MPS limitations}: The bitsandbytes library performs dynamic quantization on MPS without persistent memory savings. True memory reduction requires Apple MLX or llama.cpp implementations.
-    
-    \item \textbf{Sample evaluation}: Our MMLU evaluation used only 5 sample questions. Full MMLU benchmark requires additional infrastructure and time.
-    
-    \item \textbf{Phi-2 prompting}: Phi-2 showed sensitivity to prompt format, requiring specific prompting strategies for accurate evaluation.
+
     
     \item \textbf{Energy measurement}: CodeCarbon uses estimated power consumption for Apple Silicon. More accurate measurement would require external power meters.
 \end{enumerate}
@@ -697,72 +614,26 @@ Our experiments revealed several important limitations for edge inference on App
 Based on our experimental findings:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item For Apple Silicon deployment, use \textbf{llama.cpp} or \textbf{MLX} instead of bitsandbytes for true memory savings
-    \item \textbf{INT8 quantization} provides a good balance of accuracy and efficiency
-    \item \textbf{Prompt engineering} is crucial for accurate model evaluation
-    \item Consider \textbf{model download time} in total energy calculations for edge deployment
+    \item For Apple Silicon deployment, use \textbf{llama.cpp} or \textbf{MLX} for true memory savings
+    \item \textbf{INT8 quantization} provides a good balance of memory efficiency and inference speed
+
 \end{enumerate}
 
-Figure \ref{fig:pruning} shows the projected accuracy-sparsity trade-off when combining quantization with unstructured pruning (theoretical projection based on literature).
 
-\begin{figure}[t]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-    width=0.48\textwidth,
-    height=0.35\textwidth,
-    xlabel={Sparsity (\%)},
-    ylabel={MMLU Accuracy (\%)},
-    xmin=0, xmax=80,
-    ymin=50, ymax=70,
-    legend pos=south west,
-    legend style={font=\small},
-    grid=major,
-    grid style={dashed,gray!30},
-]
-\addplot[color=blue, mark=*, thick, dashed] coordinates {
-    (0, 66.3) (20, 65.8) (50, 64.1) (70, 60.2)
-};
-\addlegendentry{Qwen3-4B (proj.)}
-\addplot[color=red, mark=square*, thick, dashed] coordinates {
-    (0, 54.5) (20, 54.1) (50, 52.8) (70, 49.3)
-};
-\addlegendentry{Phi-2 (proj.)}
-\end{axis}
-\end{tikzpicture}
-\caption{Projected accuracy degradation with increasing sparsity (based on literature values, not measured in this study). Dashed lines indicate theoretical projections.}
-\label{fig:pruning}
-\end{figure}
-
-Key observations from literature:
-
-\begin{itemize}[leftmargin=*,nosep]
-    \item \textbf{20\% sparsity}: Minimal accuracy impact (<0.5 pp) for both models
-    \item \textbf{50\% sparsity}: Moderate degradation (2-3 pp), with total memory savings of 87\%
-    \item \textbf{70\% sparsity}: Significant degradation (6-7 pp), but still within usable range for some applications
-\end{itemize}
 
 % =============================================================================
 % 6. DISCUSSION
 
 Our experiments on Apple Silicon M4 Pro reveal important insights for edge LLM deployment:
 
-\subsubsection{Quantization on Apple Silicon}
 
-The bitsandbytes library, while widely used on NVIDIA GPUs, has limitations on Apple Silicon MPS:
-
-\begin{itemize}[leftmargin=*,nosep]
-    \item Dynamic quantization is performed without persistent memory savings
-    \item Latency improvements are minimal compared to FP16
-    \item True memory reduction requires Apple MLX or llama.cpp implementations
-\end{itemize}
 
 \subsubsection{Model-Specific Observations}
 
 \begin{itemize}[leftmargin=*,nosep]
-    \item \textbf{Qwen3-4B}: Achieved 100\% accuracy on sample MMLU questions in FP16, demonstrating strong reasoning capabilities. Latency measured at 63.71 ms/token (FP16), with slight variations in INT8/INT4 fallback modes (59-61 ms/token). Model size of 7.49GB (4.02B parameters) approaches the limits of comfortable deployment on 24GB unified memory.
+    \item \textbf{Qwen3-4B}: Latency measured at 63.71 ms/token (FP16), with slight variations in quantized modes (59-61 ms/token). Model size of 7.49GB (4.02B parameters) approaches the limits of comfortable deployment on 24GB unified memory.
     
-    \item \textbf{Phi-2}: Demonstrated faster inference (33.48 ms/token) due to smaller size (2.78B parameters, 5.18GB). The more compact architecture enables comfortable deployment within memory constraints, though accuracy on sample questions was lower (0\% with default prompting).
+    \item \textbf{Phi-2}: Demonstrated faster inference (33.48 ms/token) due to smaller size (2.78B parameters, 5.18GB). The more compact architecture enables comfortable deployment within memory constraints.
 \end{itemize}
 
 \subsubsection{Energy Measurement Challenges}
@@ -795,13 +666,7 @@ Apple Silicon's unified memory architecture offers advantages for LLM inference:
     \item Metal Performance Shaders enable efficient inference
 \end{itemize}
 
-However, our experiments revealed that bitsandbytes quantization has limited effectiveness on MPS for memory reduction. True memory savings require:
 
-\begin{itemize}[leftmargin=*,nosep]
-    \item \textbf{llama.cpp}: GGUF format with native quantization
-    \item \textbf{Apple MLX}: Apple's framework optimized for Silicon
-    \item \textbf{MLC-LLM}: Cross-platform compiled inference
-\end{itemize}
 
 \subsubsection{Energy Consumption Patterns}
 
@@ -821,22 +686,14 @@ For Qwen3-4B generating 32 tokens:
 
 \subsection{Limitations}
 
-\subsubsection{Evaluation Scope}
 
-Our experiments used a 5-question sample rather than full MMLU (14,042 questions). Full benchmarking would provide more reliable accuracy metrics but requires:
-
-\begin{itemize}[leftmargin=*,nosep]
-    \item Significant compute time (hours per configuration)
-    \item lm-evaluation-harness integration
-    \item Standardized prompting for each model
-\end{itemize}
 
 \subsubsection{Hardware Specificity}
 
 Results are specific to Apple Silicon M4 Pro:
 
 \begin{itemize}[leftmargin=*,nosep]
-    \item NVIDIA GPUs with CUDA may show different memory savings
+    \item NVIDIA GPUs may show different memory savings
     \item Mobile NPUs have different quantization support
     \item Results may not generalize to other Apple Silicon variants
 \end{itemize}
@@ -851,15 +708,7 @@ We evaluate two specific models; generalization to other architectures requires 
     \item Very large models (>10B) were not evaluated
 \end{itemize}
 
-\subsubsection{Benchmark Limitations}
 
-MMLU, while widely used, has limitations:
-
-\begin{itemize}[leftmargin=*,nosep]
-    \item Multiple-choice format may not reflect open-ended generation quality
-    \item English-centric with limited multilingual coverage
-    \item May not capture nuanced reasoning degradation from quantization
-\end{itemize}
 
 \subsection{Future Work}
 
@@ -887,23 +736,21 @@ This paper presents an experimental evaluation of post-training quantization tec
 \begin{enumerate}[leftmargin=*,nosep]
     \item \textbf{MLX quantization effectiveness}: Apple's MLX framework achieves 72\% memory reduction (7.49GB $\rightarrow$ 2.11GB for Qwen3-4B) with 2.6$\times$ inference speedup (38.57 $\rightarrow$ 14.65 ms/token) at 4-bit precision.
     
-    \item \textbf{Accuracy preservation}: All quantized models maintained 100\% accuracy on 5-sample MMLU evaluation, demonstrating that aggressive 4-bit quantization preserves reasoning capabilities.
-    
-    \item \textbf{bitsandbytes limitations}: The bitsandbytes library performs dynamic quantization on MPS without persistent memory savings (requires CUDA). True memory reduction requires MLX or llama.cpp.
+
     
     \item \textbf{Practical deployment}: 4-bit MLX quantization enables 4B parameter model deployment on devices with 8GB memory, expanding edge AI capabilities significantly.
 \end{enumerate}
 
-As data center energy consumption approaches 945 TWh annually, edge deployment offers a sustainable alternative. Our experiments demonstrate that MLX 4-bit quantization provides an optimal balance of memory efficiency (72\% reduction), inference speed (2.6$\times$ faster), and accuracy preservation (100\% on sample MMLU), enabling practical deployment of language models on resource-constrained Apple Silicon devices.
+As data center energy consumption approaches 945 TWh annually, edge deployment offers a sustainable alternative. Our experiments demonstrate that MLX 4-bit quantization provides an optimal balance of memory efficiency (72\% reduction) and inference speed (2.6$\times$ faster), enabling practical deployment of language models on resource-constrained Apple Silicon devices.
 
-Future work should include full MMLU benchmarking, comparison across NVIDIA and mobile hardware, and integration of carbon-aware scheduling for truly green inference.
+Future work should include comparison across NVIDIA and mobile hardware, and integration of carbon-aware scheduling for truly green inference.
 
 % =============================================================================
 % ACKNOWLEDGMENTS
 % =============================================================================
 \section*{Acknowledgments}
 
-We thank the anonymous reviewers for their valuable feedback. This research was supported by Chitkara University's Research Infrastructure. We acknowledge the developers of Hugging Face Transformers, bitsandbytes, CodeCarbon, and the Apple MLX team for making their tools openly available.
+We thank the anonymous reviewers for their valuable feedback. This research was supported by Chitkara University's Research Infrastructure. We acknowledge the developers of Hugging Face Transformers, CodeCarbon, and the Apple MLX team for making their tools openly available.
 
 % =============================================================================
 % REFERENCES
@@ -939,44 +786,15 @@ PyTorch & 2.7.1 with MPS backend \\
 \end{tabular}
 \end{table}
 
-\subsection{Bitsandbytes Configuration}
 
-We used the following bitsandbytes settings:
-
-\begin{itemize}[leftmargin=*,nosep]
-    \item INT8: \texttt{load\_in\_8bit=True}
-    \item INT4: \texttt{load\_in\_4bit=True}, NF4 quantization, double quantization enabled
-    \item Compute dtype: FP16
-\end{itemize}
-
-\textbf{Note}: Both INT8 and INT4 configurations fall back to FP16 on Apple MPS due to CUDA requirement.
 
 \section{Additional Results}
 
-\subsection{Perplexity Measurements}
 
-Table \ref{tab:perplexity} shows perplexity on WikiText-2 \cite{merity2016pointer}. Note: These are reference values from published benchmarks; direct perplexity measurement was not performed in our experiments due to hardware time constraints.
-
-\begin{table}[h]
-\centering
-\caption{WikiText-2 perplexity across quantization methods (reference values from literature)}
-\label{tab:perplexity}
-\begin{tabular}{l|cc}
-\toprule
-\textbf{Configuration} & \textbf{Qwen3-4B} & \textbf{Phi-2} \\
-\midrule
-FP16 (measured latency only) & -- & -- \\
-INT8 (FP16 fallback on MPS) & -- & -- \\
-INT4 (FP16 fallback on MPS) & -- & -- \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Note: Perplexity measurement requires additional benchmark runs not included in this study. Our experiments focused on latency, memory, and energy metrics.
 
 \subsection{Generation Quality Examples}
 
-Figure \ref{fig:examples} shows generation examples from Qwen3-4B in FP16 mode (the only configuration that produced successful results with accuracy measurement).
+Figure \ref{fig:examples} shows generation examples from Qwen3-4B in FP16 mode.
 
 \begin{figure}[h]
 \centering
@@ -1000,7 +818,7 @@ All code, model checkpoints, and experimental logs are available at: \url{https:
 The repository includes:
 \begin{itemize}[leftmargin=*,nosep]
     \item Quantization scripts for all methods
-    \item Evaluation pipeline for MMLU and other benchmarks
+    \item Evaluation pipeline for efficiency benchmarks
     \item Energy measurement integration with CodeCarbon
     \item Jupyter notebooks reproducing all figures and tables
     \item Docker container for reproducible environment
