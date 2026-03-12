@@ -142,7 +142,7 @@ An Evaluation of Post-Training Quantization on Apple Silicon}
 % ABSTRACT
 % =============================================================================
 \begin{abstract}
-\noindent Deploying large language models on edge devices requires aggressive memory compression. We evaluate post-training quantization (PTQ) on Apple Silicon, testing Apple's MLX framework and Ollama across Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters). On an M4 Pro with 24GB unified memory, MLX INT4 quantization achieves 269.88, 180.48, 80.69, and 96.53 tokens/second for Qwen3.5-0.8B, Qwen3.5-2B, Qwen3.5-4B, and Phi-3 Mini respectively, with memory footprints from 0.48GB to 2.47GB. MLX provides up to 9.9$\times$ speedup over Ollama. The implication is practical: all models fit within 8GB, enabling edge AI deployment while reducing energy costs.
+\noindent Using Large language models on edge devices requires memory compression. In this paper we evaluate post training quantization (PTQ) on Apple Silicon. We will be testing on Apple's MLX framework and Ollama across Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters) on an M4 Pro with 24GB unified memory, in our testing MLX INT4 quantization achieves 269.88, 180.48, 80.69, and 96.53 tokens/second for Qwen3.5-0.8B, Qwen3.5-2B, Qwen3.5-4B, and Phi-3 Mini respectively, with the memory footprints ranging from 0.48GB to 2.47GB. Results show that MLX provides up to 9.9$\times$ speedup for inferencing locally with quantized models. The implication is that all models fit within 8GB which is common for most devices, enabling edge AI deployment while reducing energy costs.
 \end{abstract}
 
 % =============================================================================
@@ -150,17 +150,17 @@ An Evaluation of Post-Training Quantization on Apple Silicon}
 % =============================================================================
 \section{Introduction}
 
-Large language models have transformed natural language processing, bringing remarkable advances in text generation, reasoning, and knowledge retrieval \cite{brown2020language, openai2023gpt4}. But this progress carries a steep environmental price. The International Energy Agency projects data centers will consume 945 TWh annually by 2030, roughly 3\% of global electricity with AI workloads driving most of this growth \cite{iea2025energyai}. Sustainable deployment strategies are no longer optional; they are essential.
+LLMs have changed the natural language processing landscape, by bringing remarkable advances in text generation, reasoning, and knowledge retrieval \cite{brown2020language, openai2023gpt4}. This progress also carries quite a big environmental price. The International Energy Agency predicts that data centers will consume 945 TWh annually by 2030, which is about 3\% of global electricity with AI workloads driving most of this growth \cite{iea2025energyai}.
 
-\subsection{The Sustainability Imperative}
+\subsection{Sustainability Challenge}
 
-LLMs exact environmental costs across their entire lifecycle. Training one large model can emit as much CO$_2$ as five cars over their lifetimes \cite{strubell2019energy}, and inference, running billions of times daily, accounts for most operational energy consumption in production \cite{patterson2021carbon}. As models grow larger to improve performance, energy demands scale with them, creating a tension between capability and sustainability.
+LLMs have quite a lot of environmental costs across their entire lifecycle. Training and inference account for most operational energy consumption in production \cite{patterson2021carbon}. As models grow larger to improve performance, energy will also increase, which creates a thin line between capability and sustainability.
 
-Edge computing offers a way out: lower latency, better privacy, and potential energy savings through local computation \cite{shi2016edge}. But deploying LLMs on edge devices is hard. Memory is tight. Compute is limited. Power budgets are strict. A 4-billion parameter model in FP16 needs about 8GB just for weights, more than many edge devices can handle. Compression is not optional.
+For this, in Edge computing we have a solution, it offers lower latency, more privacy, and a lot of energy savings through local computation \cite{shi2016edge}. But, deploying LLMs on edge devices is hard, quite hard. Memory, compute, power everything is limited, and it also can't scale very much. A 4 billion param model in FP16 needs about 8GB just for weights and decent amount of RAM, more than what many edge devices can handle. 
 
-\subsection{The Quantization Challenge}
+\subsection{Quantization Challenge}
 
-Post-training quantization (PTQ) has become the go-to technique for model compression. It reduces weight precision from 16-bit or 32-bit floating-point to 8-bit or 4-bit integers \cite{han2015deep}. Unlike quantization-aware training (QAT), PTQ works directly on pre-trained weights without retraining, which is ideal for deploying existing models on constrained hardware.
+Post Training Quantization (PTQ) has become the standard for model compression. It has the ability to reduce weight precision from 16-bit or 32-bit floating-point to 8-bit or 4-bit integers \cite{han2015deep}. Unlike Quantization Aware Training (QAT), PTQ works directly on pre-trained weights without retraining, which is ideal for deploying existing models on edge devices.
 
 Yet PTQ methods are fragmented, with different techniques performing differently across model architectures. Several questions remain open:
 
