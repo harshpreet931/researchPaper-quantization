@@ -173,29 +173,29 @@ Several questions still remain open:
 
 \subsection{Contributions}
 
-We address these questions through systematic experiments on Apple Silicon. Our contributions:
+We will address these questions via experiments on Apple Silicon. Our contributions are:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Framework Comparison}: We evaluate Ollama and MLX frameworks across Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters), finding MLX provides up to 9.9$\times$ speedup over Ollama (269.88 vs 27.24 tokens/second for Qwen3.5-0.8B).
+    \item \textbf{Framework Comparison}: We evaluated Ollama and MLX frameworks using Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters), in our findings we see that MLX provides up to 9.9$\times$ speedup over Ollama (269.88 vs 27.24 tokens/second for Qwen3.5-0.8B).
 
-    \item \textbf{Real Measurements}: We measure actual inference latency (3.71, 5.54, 12.39, and 10.36 ms/token for Qwen3.5-0.8B, 2B, 4B, and Phi-3 Mini via MLX INT4), energy consumption (0.000053 to 0.000361 kWh), and memory footprint (0.48GB to 2.47GB with MLX INT4).
+    \item \textbf{Real Measurements}: We measured inference latency (3.71, 5.54, 12.39, and 10.36 ms/token for Qwen3.5-0.8B, 2B, 4B, and Phi-3 Mini via MLX INT4), energy consumption (0.000053 to 0.000361 kWh), and memory footprint (0.48GB to 2.47GB with MLX INT4).
 
 
-    \item \textbf{Practical Guidelines}: Qwen3.5-0.8B with MLX INT4 achieves exceptional throughput (269.88 tok/s); all models fit within 8GB memory for consumer device deployment.
+    \item \textbf{Practical Guidelines}: Qwen3.5-0.8B with MLX INT4 achieves give exceptional throughput (269.88 tok/s at peak), and all models fit within 8GB memory for consumer device deployment.
 \end{enumerate}
 
-These findings have immediate practical value: organizations can reduce inference energy costs while maintaining model performance.
+These findings have an immediate value, as organizations can reduce inference energy costs while maintaining model performance.
 
 % =============================================================================
 % 2. BACKGROUND
 % =============================================================================
-\section{Background and Motivation}
+\section{Background}
 
-The environmental impact of LLMs has become a critical research frontier. While training large models emits substantial carbon dioxide, inference dominates operational energy consumption, accounting for approximately 60\% of total ML compute usage in production systems \cite{patterson2021carbon}. Edge computing offers reduced latency, enhanced privacy, and potential energy savings through local computation \cite{shi2016edge}. However, edge devices present significant constraints: limited memory (8-16GB typical), lower compute capabilities, and strict power budgets. A 4-billion parameter model in FP16 requires approximately 8GB for weights alone, motivating compression techniques that preserve model capability while reducing resource requirements.
+The impact of LLMs has become a critical research frontier especially in environmental sustainability. Training large models emits large amounts of CO_2 and inferencing it to a usable level  dominates operational energy consumption and inferencing accounts for approximately 60\% of total ML compute usage in production systems \cite{patterson2021carbon}. If we are able to gets things at edge, it offers a lot of benefits \cite{shi2016edge}. Though, edge devices have constraints, they have limited memory (8-16GB typical) and lower compute capabilities. 
 
 \subsection{Model Compression Techniques}
 
-Model compression reduces the memory footprint and computational cost of neural networks while preserving predictive capability \cite{cheng2017survey}. The primary approaches are:
+Model compression helps in reducing the memory and compute requirements of neural networks whilst keeping the accuracy almost intact \cite{cheng2017survey}. Some common approaches are:
 
 \subsubsection{Quantization}
 
@@ -205,27 +205,27 @@ Quantization maps continuous floating-point values to discrete low-bit represent
 \mathbf{W}_q = \text{clamp}\left(\text{round}\left(\frac{\mathbf{W}}{s}\right), -2^{b-1}, 2^{b-1}-1\right)
 \end{equation}
 
-where $s$ is the scale factor. The dequantized approximation is:
+where $s$ is the scale factor. And the dequantized approximation:
 
 \begin{equation}
 \hat{\mathbf{W}} = s \cdot \mathbf{W}_q
 \end{equation}
 
-The quantization error $\|\mathbf{W} - \hat{\mathbf{W}}\|$ directly impacts model accuracy.
+The quantization error $\|\mathbf{W} - \hat{\mathbf{W}}\|$ impacts model accuracy directly.
 
 \subsubsection{Pruning}
 
-Pruning removes redundant parameters by setting weights to zero based on importance criteria:
+In Pruning, based on importance criteria it will remove redundant parameters by setting weights to zero. For weight matrix $\mathbf{W}$, pruning can be expressed by:
 
 \begin{equation}
 \mathbf{W}_{\text{pruned}} = \mathbf{W} \odot \mathbf{M}, \quad \mathbf{M}_{ij} = \begin{cases} 1 & \text{if } |W_{ij}| > \tau \\ 0 & \text{otherwise} \end{cases}
 \end{equation}
 
-where $\tau$ is a threshold and $\odot$ denotes element-wise multiplication.
+where $\tau$ is a threshold and $\odot$ denotes element wise multiplication.
 
 \subsubsection{Knowledge Distillation}
 
-Knowledge distillation trains a smaller ``student'' model to mimic a larger ``teacher'' model \cite{hinton2015distilling}. While effective, it requires training access to the teacher model, making it less suitable for post-training compression.
+Knowledge distillation trains a smaller ``student'' model which basically mimics the original ``teacher'' model \cite{hinton2015distilling}. While being effective, it requires the training access to the teacher model and in alot of cases we might not have this access which makes it less suitable for post training compression.
 
 \subsection{Post-Training Quantization for Edge Deployment}
 
