@@ -162,13 +162,13 @@ For this, in Edge computing we have a solution, it offers lower latency, more pr
 
 Post Training Quantization (PTQ) has become the standard for model compression. It has the ability to reduce weight precision from 16-bit or 32-bit floating-point to 8-bit or 4-bit integers \cite{han2015deep}. Unlike Quantization Aware Training (QAT), PTQ works directly on pre-trained weights without retraining, which is ideal for deploying existing models on edge devices.
 
-Yet PTQ methods are fragmented, with different techniques performing differently across model architectures. Several questions remain open:
+Several questions still remain open:
 
 \begin{itemize}[leftmargin=*,nosep]
-    \item Which PTQ method provides the best memory efficiency for models of different sizes and architectures?
-    \item How do different quantization strategies affect energy consumption during inference?
-    \item What is the optimal bit-width for balancing memory efficiency and inference speed?
-    \item How does model architecture influence quantization sensitivity?
+    \item Which PTQ method gives the best efficiency for models?
+    \item How do different quantization strategies affect energy consumption?
+    \item What is the optimal bit-width?
+    \item How does the model architecture influence quantization sensitivity?
 \end{itemize}
 
 \subsection{Contributions}
