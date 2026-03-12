@@ -414,7 +414,7 @@ The Apple Silicon architecture provides unified memory accessible by both CPU an
     \item \textbf{Quantization}: MLX framework
     \item \textbf{Inference}: llama.cpp (GGUF format), MLX
     \item \textbf{Energy Measurement}: CodeCarbon 3.2.3
-
+\end{itemize}
 
 \subsubsection{Hyperparameters}
 
@@ -437,6 +437,7 @@ The Apple Silicon architecture provides unified memory accessible by both CPU an
 
 Table \ref{tab:memory} shows measured memory requirements from experiments on Apple Silicon M4 Pro.
 
+\begin{table}[H]
 \centering
 \caption{Model specifications and memory on Apple Silicon M4 Pro with 24GB unified memory. Qwen3.5 models via Ollama (Q4\_K\_M); Phi-3 Mini via MLX INT4.}
 \label{tab:memory}
@@ -458,6 +459,7 @@ Model sizes measured directly from loaded weights in quantized formats. With MLX
 
 Table \ref{tab:latency} presents inference latency measurements from real experiments.
 
+\begin{table}[H]
 \centering
 \caption{Inference latency on Apple Silicon M4 Pro. Qwen3.5 via Ollama (Q4\_K\_M, non-thinking mode); Phi-3 Mini via MLX INT4.}
 \label{tab:latency}
@@ -478,6 +480,7 @@ Smaller models achieve significantly higher throughput. Qwen3.5-0.8B achieves 27
 
 Apple's MLX framework provides hardware-optimized quantization for Apple Silicon. With MLX 0.31.0, we benchmarked all models with INT4 quantization. Table \ref{tab:mlx_memory} presents MLX INT4 results.
 
+\begin{table}[H]
 \centering
 \caption{MLX INT4 quantization results on Apple Silicon M4 Pro. Qwen3.5-0.8B achieves highest throughput at 269.88 tokens/second with only 0.48GB memory.}
 \label{tab:mlx_memory}
@@ -502,10 +505,13 @@ Key findings from MLX quantization:
 
     \item \textbf{Framework Selection}: MLX outperforms Ollama across all models, with speedups from 7.4$\times$ (Phi-3 Mini) to 15.2$\times$ (Qwen3.5-4B).
     \item \textbf{Practical Implications}: MLX enables real-time inference on 8GB devices, Qwen3.5-0.8B at 269.88 tok/s.
+\end{enumerate}
+
 \subsection{Ollama Inference Results}
 
 We benchmarked Qwen3.5 series using Ollama with Q4\_K\_M quantization. Table~\ref{tab:ollama_results} presents inference results in non-thinking mode.
 
+\begin{table}[H]
 \centering
 \caption{Ollama inference results on Apple Silicon M4 Pro with Q4\_K\_M quantization (non-thinking mode). Energy measured using CodeCarbon.}
 \label{tab:ollama_results}
@@ -528,6 +534,7 @@ Qwen3.5-0.8B achieves highest throughput (27.24 tok/s) with lowest energy (0.000
 
 Table \ref{tab:energy} shows energy consumption measurements tracked by CodeCarbon during experiments.
 
+\begin{table}[H]
 \centering
 \caption{Energy per inference (generating 100 tokens) measured using CodeCarbon on Apple Silicon M4 Pro. All models via Ollama.}
 \label{tab:energy}
@@ -565,8 +572,7 @@ Based on our experimental findings:
     \item \textbf{Framework choice}: Use MLX for all models on Apple Silicon, with speedups from 7.4$\times$ (Phi-3 Mini) to 15.2$\times$ (Qwen3.5-4B) vs Ollama
     
     \item \textbf{Memory constraints}: All models with MLX INT4 fit within 8GB (0.48GB to 2.47GB)
-
-
+\end{enumerate}
 
 % =============================================================================
 % 6. DISCUSSION
@@ -631,8 +637,6 @@ We tested two models; other architectures may behave differently:
     \item Qwen3.5 thinking mode (extended reasoning) not evaluated
     \item Models with different training procedures may respond differently
     \item Very large models (>10B) were not evaluated
-    \item Models with different training procedures may respond differently
-    \item Very large models (>10B) were not evaluated
 \end{itemize}
 
 
@@ -666,6 +670,7 @@ We evaluated inference frameworks for deploying LLMs on Apple Silicon edge devic
     \item \textbf{Energy efficiency}: Qwen3.5-0.8B achieves 524 tokens/Joule via Ollama, outperforming larger variants.
     
     \item \textbf{Practical deployment}: All tested models in quantized form fit within 8GB memory.
+\end{enumerate}
 
 As data center energy consumption approaches 945 TWh annually, edge deployment offers a sustainable alternative. Framework selection significantly impacts performance (MLX up to 9.9$\times$ faster than Ollama). Qwen3.5-0.8B with MLX INT4 provides optimal throughput at 269.88 tok/s.
 
@@ -683,7 +688,6 @@ We thank the anonymous reviewers for their valuable feedback. This research was 
 % =============================================================================
 % REFERENCES
 % =============================================================================
-\bibliographystyle{plainnat}
 \bibliography{references}
 
 
