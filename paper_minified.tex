@@ -327,33 +327,31 @@ In Apple Silicon energy measurement is challenging due to the unified memory arc
 
 \subsection{Experimental Design}
 
-Our experimental design follows a systematic approach to evaluate PTQ methods on Apple Silicon:
+We have a straight-forward approach to evaluate PTQ methods on Apple Silicon:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Framework Comparison}: Evaluate Ollama and MLX frameworks for inference optimization.
-    \item \textbf{Model Selection}: Test on Qwen3.5 series (0.8B, 2B, 4B) and Phi-3 Mini, representing diverse size-efficiency trade-offs.
-    \item \textbf{Comprehensive Metrics}: Measure latency, memory footprint, and energy consumption.
+    \item \textbf{Framework Comparison}: We will run evals on Ollama and MLX frameworks for inference.
+    \item \textbf{Model Selection}: We will run Qwen3.5 series (0.8B, 2B, 4B) and Phi-3 Mini, representing diverse sizes and architectures.
+    \item \textbf{Comprehensive Metrics}: We will measure latency, memory footprint, and energy consumption.
 \end{enumerate}
 
 \subsection{Models}
 
 \subsubsection{Qwen3.5 Series}
 
-The Qwen3.5 series \cite{qwen2025technical} from Alibaba represents efficient language models with hybrid reasoning capabilities:
+The Qwen3.5 series \cite{qwen2025technical} from Alibaba are efficient language models with hybrid reasoning and SOTA capabilities:
 
 \begin{itemize}[leftmargin=*,nosep]
     \item \textbf{Qwen3.5-0.8B}: 873M parameters, optimized for extreme efficiency
     \item \textbf{Qwen3.5-2B}: 2.27B parameters, balanced size-performance trade-off
-    \item \textbf{Qwen3.5-4B}: 4.66B parameters, highest capability in the series
+    \item \textbf{Qwen3.5-4B}: 4.66B parameters, more accurate model with higher resource requirements
 \end{itemize}
 
-Key features: GQA attention, RoPE embeddings, SwiGLU activation, dual-mode reasoning (thinking/non-thinking), 119 languages. All Qwen3.5 experiments conducted via both Ollama and MLX frameworks.
+Key features: GQA attention, RoPE embeddings, SwiGLU activation and dual-mode reasoning (thinking/non-thinking). All Qwen3.5 experiments conducted via both Ollama and MLX frameworks.
 
-Phi-3 Mini \cite{abdin2024phi3} is a 3.82-billion parameter model from Microsoft's Phi-3 family: 3072 hidden dimensions, 32 attention heads, 32 layers, 128K context length. Available via Ollama (Q4\_K\_M) and MLX (INT4). MLX INT4 achieves 2.29GB memory with 96.53 tokens/second.
-
+Phi-3 Mini \cite{abdin2024phi3} is a 3.82-billion parameter model from Microsoft's Phi-3 family: 3072 hidden dimensions, 32 attention heads, 32 layers, 128K context length.
 \subsection{Hardware Platform}
 
-See Section~\ref{sec:hw-setup} for detailed hardware specifications.
 
 \subsection{Evaluation Metrics}
 
@@ -403,7 +401,7 @@ All experiments are conducted on:
     \item \textbf{OS}: macOS Sequoia 15.3
 \end{itemize}
 
-The Apple Silicon architecture provides unified memory accessible by both CPU and GPU, eliminating data transfer overhead and enabling efficient inference for quantized models.
+Apple Silicon has unified memory architecture which basically means that the CPU and GPU share the same memory, this dramatically reduces the data transfer since the physical distance itself is minimized since they are on the same chip.
 
 \subsubsection{Software}
 
@@ -433,11 +431,11 @@ The Apple Silicon architecture provides unified memory accessible by both CPU an
 
 \subsection{Memory Footprint}
 
-Table \ref{tab:memory} shows measured memory requirements from experiments on Apple Silicon M4 Pro.
+Table \ref{tab:memory} shows measured memory requirements on Apple Silicon M4 Pro.
 
 \begin{table}[H]
 \centering
-\caption{Model specifications and memory on Apple Silicon M4 Pro with 24GB unified memory. Qwen3.5 models via Ollama (Q4\_K\_M); Phi-3 Mini via MLX INT4.}
+\caption{Model specifications.}
 \label{tab:memory}
 \begin{tabular}{l|ccc}
 \toprule
@@ -455,11 +453,11 @@ Model sizes measured directly from loaded weights in quantized formats. With MLX
 
 \subsection{Latency Analysis}
 
-Table \ref{tab:latency} presents inference latency measurements from real experiments.
+Table \ref{tab:latency} presents inference latency from real experiments.
 
 \begin{table}[H]
 \centering
-\caption{Inference latency on Apple Silicon M4 Pro. Qwen3.5 via Ollama (Q4\_K\_M, non-thinking mode); Phi-3 Mini via MLX INT4.}
+\caption{Inference latency.}
 \label{tab:latency}
 \begin{tabular}{l|cccc}
 \toprule
@@ -472,15 +470,15 @@ Framework & Ollama & Ollama & Ollama & MLX \\
 \end{tabular}
 \end{table}
 
-Smaller models achieve significantly higher throughput. Qwen3.5-0.8B achieves 27.24 tokens/second via Ollama; Phi-3 Mini with MLX INT4 achieves 96.53 tokens/second due to hardware optimization.
+Smaller models obviously achieve higher throughput. Qwen3.5-0.8B achieves 27.24 tokens/second via Ollama and Phi-3 Mini with MLX INT4 achieves 96.53 tokens/second due to hardware optimization on MLX.
 
 \subsection{MLX Quantization Results}
 
-Apple's MLX framework provides hardware-optimized quantization for Apple Silicon. With MLX 0.31.0, we benchmarked all models with INT4 quantization. Table \ref{tab:mlx_memory} presents MLX INT4 results.
+Apple's MLX framework optimizes for Apple hardware. With MLX 0.31.0, we benchmarked all models with INT4 quantization. Table \ref{tab:mlx_memory} presents MLX INT4 results.
 
 \begin{table}[H]
 \centering
-\caption{MLX INT4 quantization results on Apple Silicon M4 Pro. Qwen3.5-0.8B achieves highest throughput at 269.88 tokens/second with only 0.48GB memory.}
+\caption{MLX INT4 quantization.}
 \label{tab:mlx_memory}
 \begin{tabular}{l|cccc}
 \toprule
@@ -497,12 +495,13 @@ Phi-3 Mini & INT4 & 2.29 & 10.36 & 96.53 \\
 Key findings from MLX quantization:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Dramatic Speedup}: MLX INT4 provides 9.9$\times$ speedup for Qwen3.5-0.8B vs Ollama (269.88 vs 27.24 tok/s), demonstrating hardware-optimized inference.
+    \item \textbf{Dramatic Speedup}: MLX INT4 provides 9.9$\times$ speedup for Qwen3.5-0.8B vs Ollama (269.88 vs 27.24 tok/s), demonstrating hardware optimized inference.
 
-    \item \textbf{Memory Efficiency}: All models fit under 2.5GB with INT4, Qwen3.5-0.8B only 0.48GB, enabling deployment on limited-RAM devices.
+    \item \textbf{Memory Efficiency}: All models fit under 2.5GB with INT4 which is great for devices with limited RAM.
 
-    \item \textbf{Framework Selection}: MLX outperforms Ollama across all models, with speedups from 7.4$\times$ (Phi-3 Mini) to 15.2$\times$ (Qwen3.5-4B).
-    \item \textbf{Practical Implications}: MLX enables real-time inference on 8GB devices, Qwen3.5-0.8B at 269.88 tok/s.
+    \item \textbf{Framework Selection}: MLX outperforms Ollama across all models due to Apple's optimizations and this gives speedups from 7.4$\times$ (Phi-3 Mini) to 15.2$\times$ (Qwen3.5-4B).
+
+    \item \textbf{Practical Implications}: MLX enables near real-time inference on devices under 8GB RAM.
 \end{enumerate}
 
 \subsection{Ollama Inference Results}
@@ -511,7 +510,7 @@ We benchmarked Qwen3.5 series using Ollama with Q4\_K\_M quantization. Table~\re
 
 \begin{table}[H]
 \centering
-\caption{Ollama inference results on Apple Silicon M4 Pro with Q4\_K\_M quantization (non-thinking mode). Energy measured using CodeCarbon.}
+\caption{Ollama inference results. Energy measured using CodeCarbon.}
 \label{tab:ollama_results}
 \begin{tabular}{l|cccc}
 \toprule
@@ -525,7 +524,7 @@ Phi-3 Mini & 76.68 & 13.04 & 0.000100 & 3.82B \\
 \end{tabular}
 \end{table}
 
-Qwen3.5-0.8B achieves highest throughput (27.24 tok/s) with lowest energy (0.000053 kWh), ideal for energy-constrained edge deployment. Phi-3 Mini provides a middle ground at 13.04 tok/s via Ollama.
+Qwen3.5-0.8B achieves highest throughput (27.24 tok/s) again due to it's size with lowest energy (0.000053 kWh) and Phi-3 Mini provides a decent middle ground at 13.04 tok/s via Ollama.
 
 
 \subsection{Energy Consumption}
@@ -534,7 +533,7 @@ Table \ref{tab:energy} shows energy consumption measurements tracked by CodeCarb
 
 \begin{table}[H]
 \centering
-\caption{Energy per inference (generating 100 tokens) measured using CodeCarbon on Apple Silicon M4 Pro. All models via Ollama.}
+\caption{Energy per inference (generating 100 tokens) measured using CodeCarbon. All models via Ollama.}
 \label{tab:energy}
 \begin{tabular}{l|ccc}
 \toprule
@@ -548,16 +547,14 @@ Phi-3 Mini & 0.000100 & 360.0 & 278 \\
 \end{tabular}
 \end{table}
 
-Energy efficiency (tokens per Joule) decreases with model size: Qwen3.5-0.8B achieves 524 tok/J, Qwen3.5-4B only 77 tok/J. Phi-3 Mini achieves 278 tok/J, balancing capability and efficiency.
+Energy efficiency (tokens per Joule) decreases with model size, Qwen3.5-0.8B achieves 524 tok/J, Qwen3.5-4B only 77 tok/J and Phi-3 Mini achieves 278 tok/J.
 
 \subsection{Experimental Limitations}
 
 Our experiments revealed several important limitations for edge inference on Apple Silicon:
 
 \begin{enumerate}[leftmargin=*,nosep]
-
-
-    \item \textbf{Energy measurement}: CodeCarbon uses estimated power consumption for Apple Silicon. More accurate measurement would require external power meters.
+    \item \textbf{Energy measurement}: CodeCarbon provides estimates based on power models.
 \end{enumerate}
 
 \subsection{Recommendations for Practitioners}
@@ -565,7 +562,7 @@ Our experiments revealed several important limitations for edge inference on App
 Based on our experimental findings:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Model selection}: Qwen3.5-0.8B with MLX INT4 provides exceptional throughput (269.88 tok/s) for real-time applications
+    \item \textbf{Model selection}: Qwen3.5-0.8B with MLX INT4 provides exceptional throughput (269.88 tok/s).
     
     \item \textbf{Framework choice}: Use MLX for all models on Apple Silicon, with speedups from 7.4$\times$ (Phi-3 Mini) to 15.2$\times$ (Qwen3.5-4B) vs Ollama
     
@@ -579,18 +576,17 @@ Based on our experimental findings:
 
 \subsection{What This Means for Green AI}
 
-Our Apple Silicon M4 Pro experiments reveal several practical insights:
+Our Apple Silicon M4 Pro experiments reveal some insights:
 
 \subsubsection{Why Apple Silicon Works Well}
 
-Apple Silicon's unified memory architecture gives it natural advantages for LLM inference:
+Apple's unified memory architecture gives it natural advantages for LLM inference:
 
 \begin{itemize}[leftmargin=*,nosep]
     \item No GPU-CPU data transfer bottleneck
     \item 24GB unified memory accommodates all tested models in quantized form
     \item Metal Performance Shaders enable 269.88 tok/s for Qwen3.5-0.8B INT4
     \item Framework choice significantly impacts performance (MLX 9.9$\times$ faster than Ollama for Qwen3.5-0.8B)
-    \item Metal Performance Shaders enable efficient inference
 \end{itemize}
 
 
@@ -629,7 +625,7 @@ Our results apply specifically to Apple Silicon M4 Pro:
 
 \subsubsection{Model Selection}
 
-We tested two models; other architectures may behave differently:
+We tested two models, other architectures may behave entirely differently:
 
 \begin{itemize}[leftmargin=*,nosep]
     \item Qwen3.5 thinking mode (extended reasoning) not evaluated
@@ -646,7 +642,7 @@ Several directions deserve further work:
 \begin{enumerate}[leftmargin=*,nosep]
     \item \textbf{Cross-Architecture Evaluation}: Extend experiments to NVIDIA GPUs, mobile NPUs, and embedded processors.
 
-    \item \textbf{Dynamic Quantization}: Explore dynamic bit-width selection based on layer sensitivity.
+    \item \textbf{Dynamic Quantization}: Exploring dynamic bit-width selection based on layer sensitivity.
 
     \item \textbf{Task-Specific Optimization}: Do different tasks need different quantization strategies?
 
