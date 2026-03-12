@@ -238,23 +238,23 @@ PTQ's advantages: (1) no training is required (2) quantization takes minutes to 
 
 \subsection{Post-Training Quantization Methods}
 
-The development of PTQ methods has evolved rapidly, driven by the need to compress increasingly large language models. We categorize the major approaches:
+Major categories for PTQ methods are:
 
 \subsubsection{INT8 Uniform Quantization}
 
-Uniform quantization maps floating-point values to uniformly spaced integer levels. For LLMs, LLM.int8() \cite{dettmers2022llm} introduced mixed-precision decomposition, identifying outlier feature dimensions that require higher precision:
+Uniform quantization is to map floating-point values to uniformly spaced integer levels. For LLMs, LLM.int8() \cite{dettmers2022llm} introduced a mixed-precision decomposition which is used for identifying outlier feature dimensions that require higher precision:
 
 \begin{equation}
 \mathbf{Y} = \mathbf{X}_{\text{normal}} \mathbf{W}_{\text{int8}} + \mathbf{X}_{\text{outlier}} \mathbf{W}_{\text{fp16}}
 \end{equation}
 
-where $\mathbf{X}_{\text{outlier}}$ contains dimensions with values exceeding a threshold. This approach preserves accuracy for most models while providing memory savings, though with increased computational overhead for the decomposition.
+where $\mathbf{X}_{\text{outlier}}$ contains dimensions with values exceeding a threshold. This approach very much preserves the accuracy for most models whilst giving us lesser memory usage.
 
-Simple INT8 weight-only quantization provides consistent 2$\times$ memory reduction with minimal accuracy loss for most models, making it a reliable baseline approach.
+Simple INT8 quantization gives use about 2$\times$ memory reduction with almost negligible accuracy loss which makes it a reliable base approach.
 
 \subsubsection{GPTQ: Optimal Brain Quantization}
 
-GPTQ \cite{frantar2022gptq} adapts Optimal Brain Surgeon (OBS) \cite{lecun1990optimal} for LLM quantization. The key insight is to quantize weights sequentially while updating remaining weights to compensate for quantization error:
+GPTQ \cite{frantar2022gptq} adapts Optimal Brain Surgeon (OBS) \cite{lecun1990optimal} for LLM quantization. Here we quantize weights sequentially meanwhile we also keep updating remaining weights to compensate for the error:
 
 \begin{equation}
 \delta_{\mathbf{W}} = -\frac{w_q - w}{[\mathbf{H}^{-1}]_{qq}} \cdot \mathbf{H}^{-1}_{:,q}
@@ -262,11 +262,11 @@ GPTQ \cite{frantar2022gptq} adapts Optimal Brain Surgeon (OBS) \cite{lecun1990op
 
 where $\mathbf{H}$ is the Hessian matrix of the layer's output, $w$ is the original weight, $w_q$ is the quantized weight, and $q$ indexes the quantized weight position. The update $\delta_{\mathbf{W}}$ adjusts unquantized weights to minimize output error.
 
-GPTQ achieves impressive results, enabling 4-bit quantization of 175B parameter models with minimal perplexity degradation. However, the algorithm requires computing the inverse Hessian, which has $O(d^3)$ complexity for a layer with $d$ inputs, and addressed through Cholesky decomposition and lazy batch updates.
+GPTQ results in impressive performance. But in this algorithm we have to compute inverse Hessian which has $O(d^3)$ complexity for a layer with $d$ as inputs, and this is addressed through Cholesky decomposition and lazy batch updates. Whilst it's effective, its computationally expensive in nature.
 
 \subsubsection{AWQ: Activation-Aware Weight Quantization}
 
-AWQ \cite{lin2023awq} observes that not all weights are equally important: protecting just 1\% of salient weights can significantly reduce quantization error. The key innovation is identifying salient weights based on activation magnitudes:
+AWQ has a unique approach to quantization, it protects the most important weights based on their activation magnitudes, it's an optimzation over the standard quantization loss function and this results in super high accuracy:
 
 \begin{equation}
 s^* = \argmin_{s} \mathcal{L}(\mathbf{W}, s), \quad \mathcal{L} = \sum_{i,j} \left| \mathbf{X}_{i,j} \cdot (w_{i,j} - \hat{w}_{i,j}) \right|
@@ -278,13 +278,13 @@ where $s$ is a per-channel scaling factor, $\mathbf{X}$ represents activations f
 \hat{\mathbf{W}} = \text{quant}(\mathbf{W} \cdot \text{diag}(s)) \cdot \text{diag}(s)^{-1}
 \end{equation}
 
-This activation-aware scaling preserves salient weights during quantization, achieving near-lossless 4-bit compression for many models. AWQ received the Best Paper Award at MLSys 2024.
+Due to its lossless nature, AWQ received the Best Paper Award at MLSys 2024.
 
 \subsubsection{INT4 Weight-Only Quantization}
 
-Naive INT4 weight-only quantization applies uniform quantization to 4-bit precision without sophisticated error compensation. While this provides the maximum memory savings among common PTQ methods, it typically incurs significant accuracy degradation, especially for larger models or those with complex weight distributions.
+In INT4 weight only, we apply quantization to 4 bit without any compensation for errors, this will result in alot of accuracy loss espically for larger models, larger the model, more the accuracy loss.
 
-However, INT4 quantization serves as an important baseline and is increasingly viable for models specifically designed for low-precision deployment.
+However, for smaller models <4B params, INT4 can strike a good balance between memory and accuracy loss.
 
 \subsection{Quantization for Edge Deployment}
 
@@ -292,35 +292,33 @@ Several studies have explored LLM quantization for edge scenarios:
 
 \textbf{llama.cpp} \cite{llamacpp2023} introduced GGUF format with various quantization schemes (Q4\_0, Q4\_K\_M, etc.) optimized for CPU inference. Their block quantization approach balances compression and accuracy.
 
-\textbf{MLC-LLM} \cite{mlcllm2023} provides a compilation-based approach for deploying quantized LLMs across diverse hardware platforms, including mobile devices and Apple Silicon.
+\textbf{MLC-LLM} \cite{mlcllm2023} provides a compilation based approach for deploying quantized LLMs across diverse hardware platforms, including mobile devices and Apple Silicon.
 
 \textbf{Huang et al.} \cite{huang2025llms} evaluated LLM inference on edge devices using Ollama, measuring energy efficiency across 28 quantized models on Raspberry Pi 4.
 
 \textbf{Benazir and Lin} \cite{benazir2025profiling} profiled LLM inference on Apple Silicon from a quantization perspective, identifying optimal configurations for the M-series architecture.
 
-Our work extends these studies by providing a systematic comparison of inference frameworks (Ollama and MLX) specifically for recent small language models (Qwen3.5 series and Phi-3 Mini) with energy measurements on Apple Silicon.
+Our work extends these studies by providing a comparison of inference frameworks (Ollama and MLX) specifically for recent small language models (Qwen3.5 series and Phi-3 Mini) with energy measurements on Apple Silicon.
 
 \subsection{Small Language Models}
 
-Small language models (SLMs) have emerged as efficient alternatives to large models for edge deployment:
+At edge we need SLMs due to the limitations of the hardware:
 
-\textbf{Phi Series} \cite{javaheripi2023phi2, abdin2024phi3}: Microsoft's Phi models demonstrate that carefully curated training data can enable small models to match the performance of much larger models. Phi-3 Mini (3.82B parameters) achieves strong performance while maintaining a compact footprint suitable for edge deployment.
+\textbf{Phi Series} \cite{javaheripi2023phi2, abdin2024phi3}: Microsoft's Phi models show us that if we carefully curate training data, we can enable small models to match the performance of larger models. Phi-3 Mini (3.82B parameters) gets strong results while maintaining a super compact footprint.
 
-\textbf{Qwen Series} \cite{qwen2025technical}: Alibaba's Qwen models include dense and Mixture-of-Expert architectures from 0.5B to 72B parameters. The Qwen3.5 series introduces hybrid reasoning with thinking and non-thinking modes, achieving competitive performance through architectural innovations including GQA attention and dual-mode inference.
-
-These models are particularly relevant for edge deployment due to their optimized size-performance trade-off, though their quantization characteristics remain understudied.
+\textbf{Qwen Series} \cite{qwen2025technical}: Alibaba's Qwen 3.5 series of models include dense and Mixture-of-Expert architectures from 0.8B to 397B parameters. Qwen3.5 introduces a hybrid reasoning with thinking and non-thinking modes with GQA attention and dual-mode inference. Plus they are mutli modal in nature, meaning they can support images as well. Plus them have smaller footprint and high accuracy among many benchmarks make them good candidates for deployment.
 
 \subsection{Energy Measurement in ML}
 
-Measuring energy consumption for ML inference requires careful methodology:
+Measuring energy consumption:
 
-\textbf{CodeCarbon} \cite{codecarbon2023}: A Python package that tracks emissions by monitoring CPU, GPU, and RAM power consumption, integrating with regional carbon intensity data. It supports both online and offline modes.
+\textbf{CodeCarbon} \cite{codecarbon2023}: It's a python package that tracks emissions by monitoring CPU, GPU, and RAM power consumption. This also integrates with regional carbon intensity data and supports both online and offline modes.
 
-\textbf{RAPL (Running Average Power Limit)}: Intel's interface for measuring processor power consumption at fine granularity, widely used in ML energy studies.
+\textbf{RAPL (Running Average Power Limit)}: This is the intel's interface for measuring processor power consumption, and it's widely used in ML energy studies.
 
-\textbf{Hardware Power Meters}: External power meters provide ground-truth measurements but require physical instrumentation.
+\textbf{Hardware Power Meters}: they provide ground truth measurements but also require physical instrumentation.
 
-For Apple Silicon, energy measurement presents unique challenges due to the unified memory architecture and limited software interfaces. We address this through Apple's powerlog framework and CodeCarbon's macOS support.
+In Apple Silicon energy measurement is challenging due to the unified memory architecture and limited software interfaces. We are going to address this through Apple's powerlog framework and CodeCarbon's macOS support.
 
 % =============================================================================
 % 4. METHODOLOGY
