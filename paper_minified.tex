@@ -661,16 +661,14 @@ We evaluated inference frameworks for deploying LLMs on Apple Silicon edge devic
 \begin{enumerate}[leftmargin=*,nosep]
     \item \textbf{Framework comparison}: MLX INT4 achieves 269.88 tok/s for Qwen3.5-0.8B (9.9$\times$ speedup), 180.48 tok/s for Qwen3.5-2B, 80.69 tok/s for Qwen3.5-4B, and 96.53 tok/s for Phi-3 Mini (7.4$\times$ speedup).
     
-    \item \textbf{Energy efficiency}: Qwen3.5-0.8B achieves 524 tokens/Joule via Ollama, outperforming larger variants.
+    \item \textbf{Energy efficiency}: Smaller models are more energy efficient especially quantized ones.
     
     \item \textbf{Practical deployment}: All tested models in quantized form fit within 8GB memory.
 \end{enumerate}
 
-As data center energy consumption approaches 945 TWh annually, edge deployment offers a sustainable alternative. Framework selection significantly impacts performance (MLX up to 9.9$\times$ faster than Ollama). Qwen3.5-0.8B with MLX INT4 provides optimal throughput at 269.88 tok/s.
+As data center energy consumption approaches 945 TWh annually, edge deployment will surely play a massive role in the upcoming future. Choosing the correct framework would impact performance by a lot.
 
-Future work: evaluate Qwen3.5 thinking mode, cross-architecture comparison, and carbon-aware scheduling for truly green inference.
-
-\noindent\textbf{Code and Models:} Available at \url{https://github.com/anonymous/ptq-edge-evaluation}
+\noindent\textbf{Code and Models:} Available at \url{https://github.com/harshpreet931/researchPaper-quantization}
 
 % =============================================================================
 % ACKNOWLEDGMENTS
