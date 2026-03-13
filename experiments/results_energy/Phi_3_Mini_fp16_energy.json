@@ -1,0 +1,17 @@
+{
+  "model": "Phi-3-Mini",
+  "quant_method": "fp16",
+  "model_path": "microsoft/Phi-3-mini-4k-instruct",
+  "num_tokens": 100,
+  "timestamp": "2026-03-13T16:12:59.000207",
+  "load_time_seconds": 2.617623805999756,
+  "parameters": 3821079552,
+  "model_size_gb": 7.117315292358398,
+  "total_time_seconds": 4.304703333007637,
+  "ms_per_token": 43.047033330076374,
+  "tokens_per_second": 23.2304045747402,
+  "emissions_kg": 4.137827346267678e-05,
+  "energy_kwh": 5.799817148534607e-05,
+  "tokens_per_joule": 0.47894230225510065,
+  "status": "success"
+}

@@ -1,9 +1,18 @@
 {
   "model": "Phi-3-Mini",
   "quant_method": "fp16",
-  "model_path": "mlx-community/Phi-3-mini-4k-instruct",
+  "model_path": "microsoft/Phi-3-mini-4k-instruct",
   "enable_thinking": false,
-  "timestamp": "2026-03-13T10:27:25.817559",
-  "status": "failed",
-  "error": "401 Client Error. (Request ID: Root=1-69b39936-0d60ba9f60ac5fed72631012;9fb71d4a-5c46-4886-95f3-c0c5a1f81e6b)\n\nRepository Not Found for url: https://huggingface.co/api/models/mlx-community/Phi-3-mini-4k-instruct/revision/main.\nPlease make sure you specified the correct `repo_id` and `repo_type`.\nIf you are trying to access a private or gated repo, make sure you are authenticated. For more details, see https://huggingface.co/docs/huggingface_hub/authentication\nInvalid username or password."
+  "timestamp": "2026-03-13T16:12:49.232778",
+  "load_time_seconds": 2.6390018463134766,
+  "parameters": 3821079552,
+  "model_size_gb": 7.117315292358398,
+  "bits_per_weight": 16.0,
+  "total_latency_seconds": 1.1140866806575407,
+  "ms_per_token": 34.815208770548146,
+  "tokens_per_second": 28.72307923214144,
+  "accuracy": 80.0,
+  "correct": 4,
+  "total": 5,
+  "status": "success"
 }

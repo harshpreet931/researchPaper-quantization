@@ -1,0 +1,62 @@
+[
+  {
+    "framework": "MLX",
+    "quantization": "FP16",
+    "model_path": "Qwen/Qwen3.5-0.8B",
+    "num_tokens": 100,
+    "timestamp": "2026-03-13T11:56:26.520318",
+    "load_time_seconds": 1.7389640808105469,
+    "parameters": 752393024,
+    "model_size_gb": 1.4014460444450378,
+    "total_time_seconds": 0.924856625002576,
+    "ms_per_token": 9.24856625002576,
+    "tokens_per_second": 108.12486746226364,
+    "emissions_kg": 8.910509272816695e-06,
+    "energy_kwh": 1.2489483044591909e-05,
+    "tokens_per_joule": 2.22409347757639,
+    "status": "success"
+  },
+  {
+    "framework": "MLX",
+    "quantization": "INT8",
+    "model_path": "mlx-community/Qwen3.5-0.8B-8bit",
+    "num_tokens": 100,
+    "timestamp": "2026-03-13T11:56:33.491797",
+    "load_time_seconds": 1.3932018280029297,
+    "parameters": 211968832,
+    "model_size_gb": 0.7449514269828796,
+    "total_time_seconds": 0.6071412080200389,
+    "ms_per_token": 6.071412080200389,
+    "tokens_per_second": 164.70632972865099,
+    "emissions_kg": 5.8423790876274035e-06,
+    "energy_kwh": 8.189015051878717e-06,
+    "tokens_per_joule": 3.392077997390544,
+    "status": "success"
+  },
+  {
+    "framework": "MLX",
+    "quantization": "INT4",
+    "model_path": "mlx-community/Qwen3.5-0.8B-4bit",
+    "num_tokens": 100,
+    "timestamp": "2026-03-13T11:56:37.318567",
+    "load_time_seconds": 1.1888930797576904,
+    "parameters": 117982016,
+    "model_size_gb": 0.39482325315475464,
+    "total_time_seconds": 0.45677633298328146,
+    "ms_per_token": 4.567763329832815,
+    "tokens_per_second": 218.92552827087937,
+    "emissions_kg": 4.395827164893776e-06,
+    "energy_kwh": 6.161444555182244e-06,
+    "tokens_per_joule": 4.508322282055521,
+    "status": "success"
+  },
+  {
+    "framework": "Ollama",
+    "quantization": "Q4_K_M",
+    "model": "qwen3.5:0.8b",
+    "num_tokens": 100,
+    "timestamp": "2026-03-13T11:56:39.615539",
+    "status": "failed",
+    "error": "Command '['ollama', 'pull', 'qwen3.5:0.8b']' returned non-zero exit status 1."
+  }
+]

@@ -120,14 +120,14 @@ An Evaluation of Post-Training Quantization on Apple Silicon}
   \begin{minipage}{0.42\textwidth}
     \centering
     \textbf{\normalsize Harshpreet Singh} \\[3pt]
-    \texttt{harshpreet393.be22@chitkara.edu.in}
+    \texttt{harshpreet393.be22@chitkara.edu.in} \\
     \texttt{Chitkara University, India}
   \end{minipage}
   \hfill
   \begin{minipage}{0.42\textwidth}
     \centering
     \textbf{\normalsize Sameer Kumar} \\[3pt]
-    \texttt{sameer776.be22@chitkara.edu.in}
+    \texttt{sameer776.be22@chitkara.edu.in} \\
     \texttt{Chitkara University, India}
   \end{minipage}
   \\[6pt]
@@ -143,7 +143,7 @@ An Evaluation of Post-Training Quantization on Apple Silicon}
 % ABSTRACT
 % =============================================================================
 \begin{abstract}
-\noindent Using Large language models on edge devices requires memory compression. In this paper we evaluate post training quantization (PTQ) on Apple Silicon. We test on Apple's MLX framework and Ollama across Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters) on an M4 Pro with 24GB unified memory. MLX INT4 quantization achieves 213.11, 131.86, 71.21, and 88.40 tokens/second for Qwen3.5-0.8B, Qwen3.5-2B, Qwen3.5-4B, and Phi-3 Mini respectively, with memory footprints ranging from 0.39GB to 2.20GB. Within MLX, INT4 provides 2.0$\times$ to 2.9$\times$ speedup over FP16 with 3.5$\times$ memory reduction. MLX outperforms Ollama by 6.8$\times$ to 13.4$\times$ in throughput and provides 6.7$\times$ to 19.0$\times$ energy savings. All models fit within 8GB, enabling edge AI deployment while reducing energy costs.
+\noindent Using Large language models on edge devices requires memory compression. In this paper we evaluate post training quantization (PTQ) on Apple Silicon. We test on Apple's MLX framework and Ollama across Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters) on an M4 Pro with 24GB unified memory. MLX INT4 quantization achieves 213.11, 131.86, 71.21, and 88.40 tokens/second for Qwen3.5-0.8B, Qwen3.5-2B, Qwen3.5-4B, and Phi-3 Mini respectively, with memory footprints ranging from 0.39GB to 2.20GB. Within MLX, INT4 provides 2.0$\times$ to 3.8$\times$ speedup over FP16 with 3.5$\times$--3.6$\times$ memory reduction. MLX outperforms Ollama by 6.8$\times$ to 13.4$\times$ in throughput and provides 6.7$\times$ to 19.0$\times$ energy savings. All models fit within 8GB, enabling edge AI deployment while reducing energy costs.
 \end{abstract}
 
 % =============================================================================
@@ -177,9 +177,9 @@ Several questions still remain open:
 We will address these questions via experiments on Apple Silicon. Our contributions are:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Quantization Analysis}: We evaluated MLX quantization (FP16, INT8, INT4) on Qwen3.5 series and Phi-3 Mini, finding INT4 provides 2.0$\times$ to 2.9$\times$ speedup over FP16 with 3.5$\times$ memory reduction.
+    \item \textbf{Quantization Analysis}: We evaluated MLX quantization (FP16, INT8, INT4) on Qwen3.5 series and Phi-3 Mini, finding INT4 provides 2.0$\times$ to 3.8$\times$ speedup over FP16 with 3.5$\times$--3.6$\times$ memory reduction.
 
-    \item \textbf{Energy Measurements}: We measured energy consumption across all quantization levels, finding INT4 reduces energy by 2.2$\times$ to 2.9$\times$ vs FP16 within MLX, and MLX INT4 provides 6.7$\times$ to 19.0$\times$ energy savings vs Ollama.
+    \item \textbf{Energy Measurements}: We measured energy consumption across all quantization levels, finding INT4 reduces energy by 2.2$\times$ to 3.9$\times$ vs FP16 within MLX, and MLX INT4 provides 6.7$\times$ to 19.0$\times$ energy savings vs Ollama.
 
     \item \textbf{Framework Comparison}: MLX INT4 outperforms Ollama Q4\_K\_M by 6.8$\times$ to 13.4$\times$ in throughput, with Qwen3.5-0.8B achieving 213.11 tok/s via MLX vs 27.24 tok/s via Ollama.
 \end{enumerate}
@@ -191,7 +191,7 @@ These findings have an immediate value, as organizations can reduce inference en
 % =============================================================================
 \section{Background}
 
-The impact of LLMs has become a critical research frontier especially in environmental sustainability. Training large models emits large amounts of carbon dioxide and inferencing it to a usable level  dominates operational energy consumption and inferencing accounts for approximately 60\% of total ML compute usage in production systems \cite{patterson2021carbon}. If we are able to gets things at edge, it offers a lot of benefits \cite{shi2016edge}. Though, edge devices have constraints, they have limited memory (8-16GB typical) and lower compute capabilities. 
+The impact of LLMs has become a critical research frontier especially in environmental sustainability. Training large models emits substantial amounts of carbon dioxide, and inference dominates operational energy consumption, accounting for approximately 60\% of total ML compute usage in production systems \cite{patterson2021carbon}. Moving workloads to the edge offers significant benefits \cite{shi2016edge}. However, edge devices have constraints: they have limited memory (8--16\,GB typical) and lower compute capabilities. 
 
 \subsection{Model Compression Techniques}
 
@@ -225,7 +225,7 @@ where $\tau$ is a threshold and $\odot$ denotes element wise multiplication.
 
 \subsubsection{Knowledge Distillation}
 
-Knowledge distillation trains a smaller ``student'' model which basically mimics the original ``teacher'' model \cite{hinton2015distilling}. While being effective, it requires the training access to the teacher model and in alot of cases we might not have this access which makes it less suitable for post training compression.
+Knowledge distillation trains a smaller ``student'' model which basically mimics the original ``teacher'' model \cite{hinton2015distilling}. While being effective, it requires the training access to the teacher model and in a lot of cases we might not have this access which makes it less suitable for post training compression.
 
 \subsection{Post-Training Quantization for Edge Deployment}
 
@@ -250,7 +250,7 @@ Uniform quantization is to map floating-point values to uniformly spaced integer
 
 where $\mathbf{X}_{\text{outlier}}$ contains dimensions with values exceeding a threshold. This approach very much preserves the accuracy for most models whilst giving us lesser memory usage.
 
-Simple INT8 quantization gives use about 2$\times$ memory reduction with almost negligible accuracy loss which makes it a reliable base approach.
+Simple INT8 quantization gives us about 2$\times$ memory reduction with almost negligible accuracy loss, making it a reliable baseline approach.
 
 \subsubsection{GPTQ: Optimal Brain Quantization}
 
@@ -262,11 +262,11 @@ GPTQ \cite{frantar2022gptq} adapts Optimal Brain Surgeon (OBS) \cite{lecun1990op
 
 where $\mathbf{H}$ is the Hessian matrix of the layer's output, $w$ is the original weight, $w_q$ is the quantized weight, and $q$ indexes the quantized weight position. The update $\delta_{\mathbf{W}}$ adjusts unquantized weights to minimize output error.
 
-GPTQ results in impressive performance. But in this algorithm we have to compute inverse Hessian which has $O(d^3)$ complexity for a layer with $d$ as inputs, and this is addressed through Cholesky decomposition and lazy batch updates. Whilst it's effective, its computationally expensive in nature.
+GPTQ results in impressive performance. But in this algorithm we have to compute inverse Hessian which has $O(d^3)$ complexity for a layer with $d$ as inputs, and this is addressed through Cholesky decomposition and lazy batch updates. Whilst it's effective, it is computationally expensive in nature.
 
 \subsubsection{AWQ: Activation-Aware Weight Quantization}
 
-AWQ has a unique approach to quantization, it protects the most important weights based on their activation magnitudes, it's an optimzation over the standard quantization loss function and this results in super high accuracy:
+AWQ has a unique approach to quantization, it protects the most important weights based on their activation magnitudes, it's an optimization over the standard quantization loss function and this results in super high accuracy:
 
 \begin{equation}
 s^* = \argmin_{s} \mathcal{L}(\mathbf{W}, s), \quad \mathcal{L} = \sum_{i,j} \left| \mathbf{X}_{i,j} \cdot (w_{i,j} - \hat{w}_{i,j}) \right|
@@ -282,7 +282,7 @@ Due to its lossless nature, AWQ received the Best Paper Award at MLSys 2024.
 
 \subsubsection{INT4 Weight-Only Quantization}
 
-In INT4 weight only, we apply quantization to 4 bit without any compensation for errors, this will result in alot of accuracy loss espically for larger models, larger the model, more the accuracy loss.
+In INT4 weight-only quantization, we apply quantization to 4 bits without any compensation for errors; this results in a lot of accuracy loss especially for larger models---the larger the model, the greater the accuracy loss.
 
 However, for smaller models <4B params, INT4 can strike a good balance between memory and accuracy loss.
 
@@ -302,15 +302,15 @@ Our work extends these studies by providing a comparison of inference frameworks
 
 \subsection{Small Language Models}
 
-At edge we need SLMs due to the limitations of the hardware:
+At the edge, we need SLMs due to the hardware limitations:
 
 \textbf{Phi Series} \cite{javaheripi2023phi2, abdin2024phi3}: Microsoft's Phi models show us that if we carefully curate training data, we can enable small models to match the performance of larger models. Phi-3 Mini (3.82B parameters) gets strong results while maintaining a super compact footprint.
 
-\textbf{Qwen Series} \cite{qwen2025technical}: Alibaba's Qwen 3.5 series of models include dense and Mixture-of-Expert architectures from 0.8B to 397B parameters. Qwen3.5 introduces a hybrid reasoning with thinking and non-thinking modes with GQA attention and dual-mode inference. Plus they are mutli modal in nature, meaning they can support images as well. Plus them have smaller footprint and high accuracy among many benchmarks make them good candidates for deployment.
+\textbf{Qwen Series} \cite{qwen2025technical}: Alibaba's Qwen 3.5 series of models include dense and Mixture-of-Expert architectures from 0.8B to 397B parameters. Qwen3.5 introduces a hybrid reasoning with thinking and non-thinking modes with GQA attention and dual-mode inference. Plus they are multimodal in nature, meaning they can support images as well. Furthermore, their smaller footprint and high accuracy among many benchmarks make them good candidates for deployment.
 
 \subsection{Energy Measurement in ML}
 
-Measuring energy consumption:
+Several tools have been developed for measuring energy consumption in ML workloads:
 
 \textbf{CodeCarbon} \cite{codecarbon2023}: It's a python package that tracks emissions by monitoring CPU, GPU, and RAM power consumption. This also integrates with regional carbon intensity data and supports both online and offline modes.
 
@@ -347,14 +347,19 @@ The Qwen3.5 series \cite{qwen2025technical} from Alibaba are efficient language 
     \item \textbf{Qwen3.5-4B}: 4.66B parameters, more accurate model with higher resource requirements
 \end{itemize}
 
-Key features: GQA attention, RoPE embeddings, SwiGLU activation and dual-mode reasoning (thinking/non-thinking). All Qwen3.5 experiments conducted via both Ollama and MLX frameworks.
+Key features: GQA attention, RoPE embeddings, SwiGLU activation and dual-mode reasoning (thinking/\allowbreak non-thinking). All Qwen3.5 experiments conducted via both Ollama and MLX frameworks.
 
-Phi-3 Mini \cite{abdin2024phi3} is a 3.82-billion parameter model from Microsoft's Phi-3 family: 3072 hidden dimensions, 32 attention heads, 32 layers, 128K context length.
+\subsubsection{Phi-3 Mini}
+
+Phi-3 Mini \cite{abdin2024phi3} is a 3.82-billion parameter model from Microsoft's Phi-3 family: 3072 hidden dimensions, 32 attention heads, 32 layers, 128K context length. Phi-3 Mini experiments were conducted via both Ollama and MLX frameworks.
+
 \subsection{Hardware Platform}
 
+All experiments are conducted on Apple Silicon hardware. The M4 Pro's unified memory architecture eliminates CPU--GPU data transfer overhead and enables efficient on-device LLM inference. Full hardware specifications are listed in Section~\ref{sec:hw-setup}.
 
 \subsection{Evaluation Metrics}
 
+We evaluate each model and quantization configuration along three primary axes: inference latency, memory footprint, and energy consumption. Each metric is measured over 10 runs after a warmup pass.
 
 \subsubsection{Latency}
 
@@ -428,6 +433,7 @@ Apple Silicon has unified memory architecture which basically means that the CPU
 % =============================================================================
 \section{Experiments and Results}
 
+We present results from benchmarking Qwen3.5 (0.8B, 2B, 4B) and Phi-3 Mini under MLX (FP16, INT8, INT4) and Ollama (Q4\_K\_M) on an Apple M4 Pro. Each measurement reflects the mean over 10 runs after a warmup pass. Raw data and scripts are available in the project repository.
 
 \subsection{Memory Footprint}
 
@@ -465,7 +471,7 @@ Table \ref{tab:quant_comparison} compares different quantization methods on Qwen
 \midrule
 FP16 & MLX & 1.40 & 108.12 & 9.25 & 0.000012 & 2.2 & 1.0$\times$ \\
 INT8 & MLX & 0.74 & 164.71 & 6.07 & 0.000008 & 3.4 & 1.5$\times$ \\
-INT4 & MLX & 0.39 & 218.93 & 4.57 & 0.000006 & 4.5 & 2.0$\times$ \\
+INT4 & MLX & 0.39 & 213.11 & 4.69 & 0.000006 & 4.5 & 2.0$\times$ \\
 Q4\_K\_M & Ollama & 0.52 & 27.24 & 36.71 & 0.000053 & 0.5 & 0.3$\times$ \\
 \bottomrule
 \end{tabular}
@@ -490,12 +496,12 @@ Table \ref{tab:latency} presents inference latency from real experiments.
 Qwen3.5-0.8B & 104.69 & 1.40 & 166.08 & 0.74 & 213.11 & 0.39 & 2.0$\times$ \\
 Qwen3.5-2B & 52.08 & 3.51 & 87.42 & 1.86 & 131.86 & 0.99 & 2.5$\times$ \\
 Qwen3.5-4B & 24.15 & 7.83 & 42.49 & 4.16 & 71.21 & 2.20 & 2.9$\times$ \\
-Phi-3 Mini & -- & -- & 45.64 & 3.78 & 88.40 & 2.00 & -- \\
+Phi-3 Mini & 23.23 & 7.12 & 45.64 & 3.78 & 88.40 & 2.00 & 3.8$\times$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-INT4 quantization provides 2.0$\times$ to 2.9$\times$ speedup over FP16, with memory reduction of 3.5$\times$ to 3.6$\times$. Larger models show greater relative speedup from quantization.
+INT4 quantization provides 2.0$\times$ to 3.8$\times$ speedup over FP16, with memory reduction of 3.5$\times$ to 3.6$\times$. Larger models show greater relative speedup from quantization.
 
 \subsection{MLX Quantization Results}
 
@@ -521,7 +527,7 @@ Phi-3 Mini & 88.40 & 2.00 & 13.04 & 6.8$\times$ \\
 Key findings from MLX quantization:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Quantization Benefits}: INT4 provides 2.0$\times$ to 2.9$\times$ speedup over FP16 within MLX, with memory savings of 3.5$\times$ to 3.6$\times$.
+    \item \textbf{Quantization Benefits}: INT4 provides 2.0$\times$ to 3.8$\times$ speedup over FP16 within MLX, with memory savings of 3.5$\times$ to 3.6$\times$.
 
     \item \textbf{Framework Selection}: MLX outperforms Ollama across all models (6.8$\times$ to 13.4$\times$ speedup), though note they use different quantization schemes (pure INT4 vs block quantization Q4\_K\_M).
 
@@ -569,12 +575,12 @@ Table \ref{tab:mlx_energy} shows MLX energy consumption across quantization leve
 Qwen3.5-0.8B & 104.69 & 0.000013 & 166.08 & 0.000008 & 213.11 & 0.000006 & 2.2$\times$ \\
 Qwen3.5-2B & 52.08 & 0.000026 & 87.42 & 0.000015 & 131.86 & 0.000010 & 2.6$\times$ \\
 Qwen3.5-4B & 24.15 & 0.000056 & 42.49 & 0.000032 & 71.21 & 0.000019 & 2.9$\times$ \\
-Phi-3 Mini & -- & -- & 45.64 & 0.000030 & 88.40 & 0.000015 & -- \\
+Phi-3 Mini & 23.23 & 0.000058 & 45.64 & 0.000030 & 88.40 & 0.000015 & 3.9$\times$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-INT4 quantization reduces energy consumption by 2.2$\times$ to 2.9$\times$ compared to FP16 within MLX.
+INT4 quantization reduces energy consumption by 2.2$\times$ to 3.9$\times$ compared to FP16 within MLX.
 
 Table \ref{tab:framework_energy} compares energy efficiency between MLX and Ollama frameworks.
 
@@ -603,7 +609,11 @@ MLX provides 6.7$\times$ to 19.0$\times$ energy savings compared to Ollama, whil
 Our experiments revealed several important limitations for edge inference on Apple Silicon:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Energy measurement}: CodeCarbon provides estimates based on power models.
+    \item \textbf{Energy measurement}: CodeCarbon provides estimates based on power models rather than direct hardware sensor readings; absolute energy values should be treated as approximations.
+
+    \item \textbf{Token count}: Benchmarks use 100-token generation runs; energy and throughput characteristics may differ for longer sequences or streaming workloads.
+
+    \item \textbf{Single device}: All results are from a single M4 Pro unit; chip-to-chip variation and thermal throttling under sustained load are not characterized.
 \end{enumerate}
 
 \subsection{Recommendations for Practitioners}
@@ -654,13 +664,14 @@ Energy efficiency varies with model size and quantization:
 \begin{itemize}[leftmargin=*,nosep]
     \item Qwen3.5-0.8B INT4: 4.4 tokens/Joule (most efficient)
     \item Qwen3.5-4B INT4: 1.5 tokens/Joule
+    \item Phi-3 Mini FP16: 0.5 tokens/Joule
     \item Phi-3 Mini INT4: 1.8 tokens/Joule
-    \item INT4 quantization improves energy efficiency by 2.2$\times$ to 2.9$\times$ over FP16
+    \item INT4 quantization improves energy efficiency by 2.2$\times$ to 3.9$\times$ over FP16
 \end{itemize}
 
 \subsection{Limitations}
 
-
+Despite strong results, several factors constrain the generalizability of our findings.
 
 \subsubsection{Hardware Specificity}
 
@@ -674,7 +685,7 @@ Our results apply specifically to Apple Silicon M4 Pro:
 
 \subsubsection{Model Selection}
 
-We tested two models, other architectures may behave entirely differently:
+We tested four models across two families; other architectures may behave entirely differently:
 
 \begin{itemize}[leftmargin=*,nosep]
     \item Qwen3.5 thinking mode (extended reasoning) not evaluated
@@ -708,7 +719,7 @@ Several directions deserve further work:
 We evaluated inference frameworks for deploying LLMs on Apple Silicon edge devices. Testing Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters) on an M4 Pro with 24GB unified memory, we found:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Quantization benefits}: Within MLX, INT4 provides 2.0$\times$ to 2.9$\times$ speedup over FP16 with 3.5$\times$ memory reduction and 2.2$\times$ to 2.9$\times$ energy savings. Qwen3.5-0.8B achieves 213.11 tok/s with INT4 vs 104.69 tok/s with FP16.
+    \item \textbf{Quantization benefits}: Within MLX, INT4 provides 2.0$\times$ to 3.8$\times$ speedup over FP16 with 3.5$\times$--3.6$\times$ memory reduction and 2.2$\times$ to 3.9$\times$ energy savings. Qwen3.5-0.8B achieves 213.11 tok/s with INT4 vs 104.69 tok/s with FP16.
     
     \item \textbf{Framework comparison}: MLX INT4 outperforms Ollama Q4\_K\_M by 6.8$\times$ to 13.4$\times$ in throughput and provides 6.7$\times$ to 19.0$\times$ energy savings across all models.
     
@@ -717,7 +728,9 @@ We evaluated inference frameworks for deploying LLMs on Apple Silicon edge devic
 
 As data center energy consumption approaches 945 TWh annually, edge deployment will surely play a massive role in the upcoming future. Choosing the correct framework would impact performance by a lot.
 
+\begin{sloppypar}
 \noindent\textbf{Code and Models:} Available at \url{https://github.com/harshpreet931/researchPaper-quantization}
+\end{sloppypar}
 
 % =============================================================================
 % ACKNOWLEDGMENTS

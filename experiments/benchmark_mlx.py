@@ -139,7 +139,7 @@ def main():
         ("mlx-community/Qwen3.5-2B-8bit", "Qwen3.5-2B", "8bit", False),
         ("mlx-community/Qwen3.5-4B-8bit", "Qwen3.5-4B", "8bit", False),
         # Phi-3 Mini
-        ("mlx-community/Phi-3-mini-4k-instruct", "Phi-3-Mini", "fp16", False),
+        ("microsoft/Phi-3-mini-4k-instruct", "Phi-3-Mini", "fp16", False),
         ("mlx-community/Phi-3-mini-4k-instruct-4bit", "Phi-3-Mini", "4bit", False),
         ("mlx-community/Phi-3-mini-4k-instruct-8bit", "Phi-3-Mini", "8bit", False),
     ]
