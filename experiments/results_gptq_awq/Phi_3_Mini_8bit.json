@@ -1,0 +1,18 @@
+{
+  "model": "Phi-3-Mini",
+  "quant_method": "8bit",
+  "model_path": "mlx-community/Phi-3-mini-4k-instruct-8bit",
+  "enable_thinking": false,
+  "timestamp": "2026-03-13T10:27:30.418744",
+  "load_time_seconds": 224.9498770236969,
+  "parameters": 1074822144,
+  "model_size_gb": 3.781248092651367,
+  "bits_per_weight": 30.219580023836947,
+  "total_latency_seconds": 0.6449167363365026,
+  "ms_per_token": 20.153648010515706,
+  "tokens_per_second": 49.61880843995207,
+  "accuracy": 80.0,
+  "correct": 4,
+  "total": 5,
+  "status": "success"
+}

@@ -1,0 +1,13 @@
+{
+  "model": "Qwen3.5-0.8B",
+  "quant_method": "fp16",
+  "model_path": "Qwen/Qwen3.5-0.8B",
+  "enable_thinking": true,
+  "timestamp": "2026-03-13T10:18:32.867351",
+  "load_time_seconds": 1.9416580200195312,
+  "parameters": 752393024,
+  "model_size_gb": 1.4014460444450378,
+  "bits_per_weight": 16.00005512012828,
+  "status": "failed",
+  "error": "generate_step() got an unexpected keyword argument 'enable_thinking'"
+}

@@ -1,0 +1,18 @@
+{
+  "model": "Qwen3.5-4B",
+  "quant_method": "fp16",
+  "model_path": "Qwen/Qwen3.5-4B",
+  "enable_thinking": false,
+  "timestamp": "2026-03-13T10:10:32.718920",
+  "load_time_seconds": 470.5842728614807,
+  "parameters": 4205751296,
+  "model_size_gb": 7.833829402923584,
+  "bits_per_weight": 16.000014608567096,
+  "total_latency_seconds": 1.4167960000146802,
+  "ms_per_token": 44.274875000458756,
+  "tokens_per_second": 22.58617330912032,
+  "accuracy": 100.0,
+  "correct": 5,
+  "total": 5,
+  "status": "success"
+}
