@@ -142,7 +142,7 @@ An Evaluation of Post-Training Quantization on Apple Silicon}
 % ABSTRACT
 % =============================================================================
 \begin{abstract}
-\noindent Using Large language models on edge devices requires memory compression. In this paper we evaluate post training quantization (PTQ) on Apple Silicon. We test on Apple's MLX framework and Ollama across Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters) on an M4 Pro with 24GB unified memory, and in our testing MLX INT4 quantization achieves 142.46, 100.06, 58.86, and 83.09 tokens/second for Qwen3.5-0.8B, Qwen3.5-2B, Qwen3.5-4B, and Phi-3 Mini respectively, with memory footprints ranging from 0.39GB to 2.20GB. Within MLX, INT4 provides 1.66$\times$ to 2.61$\times$ speedup over FP16 with 3.5$\times$ memory reduction. MLX outperforms Ollama by 5.2$\times$ to 11.1$\times$ across all models. All models fit within 8GB, enabling edge AI deployment while reducing energy costs.
+\noindent Using Large language models on edge devices requires memory compression. In this paper we evaluate post training quantization (PTQ) on Apple Silicon. We test on Apple's MLX framework and Ollama across Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters) on an M4 Pro with 24GB unified memory. MLX INT4 quantization achieves 213.11, 131.86, 71.21, and 88.40 tokens/second for Qwen3.5-0.8B, Qwen3.5-2B, Qwen3.5-4B, and Phi-3 Mini respectively, with memory footprints ranging from 0.39GB to 2.20GB. Within MLX, INT4 provides 2.0$\times$ to 2.9$\times$ speedup over FP16 with 3.5$\times$ memory reduction. MLX outperforms Ollama by 6.8$\times$ to 13.4$\times$ in throughput and provides 6.7$\times$ to 19.0$\times$ energy savings. All models fit within 8GB, enabling edge AI deployment while reducing energy costs.
 \end{abstract}
 
 % =============================================================================
@@ -176,12 +176,11 @@ Several questions still remain open:
 We will address these questions via experiments on Apple Silicon. Our contributions are:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Quantization Analysis}: We evaluated MLX quantization (FP16, INT8, INT4) on Qwen3.5 series and Phi-3 Mini, finding INT4 provides 1.66$\times$ to 2.61$\times$ speedup over FP16 with 3.5$\times$ memory reduction.
+    \item \textbf{Quantization Analysis}: We evaluated MLX quantization (FP16, INT8, INT4) on Qwen3.5 series and Phi-3 Mini, finding INT4 provides 2.0$\times$ to 2.9$\times$ speedup over FP16 with 3.5$\times$ memory reduction.
 
-    \item \textbf{Measurements}: We measured inference latency (7.02, 9.99, 16.99, and 12.03 ms/token for Qwen3.5-0.8B, 2B, 4B, and Phi-3 Mini via MLX INT4), energy consumption (0.000053 to 0.000361 kWh via Ollama), and memory footprint (0.39GB to 2.20GB with MLX INT4).
+    \item \textbf{Energy Measurements}: We measured energy consumption across all quantization levels, finding INT4 reduces energy by 2.2$\times$ to 2.9$\times$ vs FP16 within MLX, and MLX INT4 provides 6.7$\times$ to 19.0$\times$ energy savings vs Ollama.
 
-
-    \item \textbf{Framework Comparison}: MLX INT4 outperforms Ollama Q4\_K\_M by 5.2$\times$ to 11.1$\times$ across all models, with Qwen3.5-0.8B achieving 142.46 tok/s via MLX vs 27.24 tok/s via Ollama.
+    \item \textbf{Framework Comparison}: MLX INT4 outperforms Ollama Q4\_K\_M by 6.8$\times$ to 13.4$\times$ in throughput, with Qwen3.5-0.8B achieving 213.11 tok/s via MLX vs 27.24 tok/s via Ollama.
 \end{enumerate}
 
 These findings have an immediate value, as organizations can reduce inference energy costs while maintaining model performance.
@@ -457,7 +456,7 @@ Table \ref{tab:latency} presents inference latency from real experiments.
 
 \begin{table}[H]
 \centering
-\caption{MLX quantization comparison on Apple Silicon M4 Pro.}
+\caption{MLX quantization comparison on Apple Silicon M4 Pro (100 tokens).}
 \label{tab:latency}
 \begin{tabular}{l|ccccccc}
 \toprule
@@ -465,15 +464,15 @@ Table \ref{tab:latency} presents inference latency from real experiments.
 \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
 & tok/s & GB & tok/s & GB & tok/s & GB & \\
 \midrule
-Qwen3.5-0.8B & 85.79 & 1.40 & 118.28 & 0.74 & 142.46 & 0.39 & 1.66$\times$ \\
-Qwen3.5-2B & 46.71 & 3.51 & 71.12 & 1.86 & 100.06 & 0.99 & 2.14$\times$ \\
-Qwen3.5-4B & 22.59 & 7.83 & 38.45 & 4.16 & 58.86 & 2.20 & 2.61$\times$ \\
-Phi-3 Mini & -- & -- & 49.62 & 3.78 & 83.09 & 2.00 & -- \\
+Qwen3.5-0.8B & 104.69 & 1.40 & 166.08 & 0.74 & 213.11 & 0.39 & 2.0$\times$ \\
+Qwen3.5-2B & 52.08 & 3.51 & 87.42 & 1.86 & 131.86 & 0.99 & 2.5$\times$ \\
+Qwen3.5-4B & 24.15 & 7.83 & 42.49 & 4.16 & 71.21 & 2.20 & 2.9$\times$ \\
+Phi-3 Mini & -- & -- & 45.64 & 3.78 & 88.40 & 2.00 & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-INT4 quantization provides consistent speedups over FP16 across all models (1.66$\times$ to 2.61$\times$), with memory reduction of 3.5$\times$ to 3.6$\times$. Larger models show greater relative speedup from quantization.
+INT4 quantization provides 2.0$\times$ to 2.9$\times$ speedup over FP16, with memory reduction of 3.5$\times$ to 3.6$\times$. Larger models show greater relative speedup from quantization.
 
 \subsection{MLX Quantization Results}
 
@@ -488,10 +487,10 @@ Apple's MLX framework optimizes for Apple hardware. With MLX 0.31.0, we benchmar
 \textbf{Model} & \textbf{MLX INT4} & \textbf{MLX Mem} & \textbf{Ollama Q4\_K\_M} & \textbf{Speedup} \\
 & tok/s & GB & tok/s & \\
 \midrule
-Qwen3.5-0.8B & 142.46 & 0.39 & 27.24 & 5.2$\times$ \\
-Qwen3.5-2B & 100.06 & 0.99 & 18.07 & 5.5$\times$ \\
-Qwen3.5-4B & 58.86 & 2.20 & 5.30 & 11.1$\times$ \\
-Phi-3 Mini & 83.09 & 2.00 & 13.04 & 6.4$\times$ \\
+Qwen3.5-0.8B & 213.11 & 0.39 & 27.24 & 7.8$\times$ \\
+Qwen3.5-2B & 131.86 & 0.99 & 18.07 & 7.3$\times$ \\
+Qwen3.5-4B & 71.21 & 2.20 & 5.30 & 13.4$\times$ \\
+Phi-3 Mini & 88.40 & 2.00 & 13.04 & 6.8$\times$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -499,59 +498,82 @@ Phi-3 Mini & 83.09 & 2.00 & 13.04 & 6.4$\times$ \\
 Key findings from MLX quantization:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Quantization Benefits}: INT4 provides 1.66$\times$ to 2.61$\times$ speedup over FP16 within MLX, with memory savings of 3.5$\times$ to 3.6$\times$.
+    \item \textbf{Quantization Benefits}: INT4 provides 2.0$\times$ to 2.9$\times$ speedup over FP16 within MLX, with memory savings of 3.5$\times$ to 3.6$\times$.
 
-    \item \textbf{Framework Selection}: MLX outperforms Ollama across all models (5.2$\times$ to 11.1$\times$ speedup), though note they use different quantization schemes (pure INT4 vs block quantization Q4\_K\_M).
+    \item \textbf{Framework Selection}: MLX outperforms Ollama across all models (6.8$\times$ to 13.4$\times$ speedup), though note they use different quantization schemes (pure INT4 vs block quantization Q4\_K\_M).
 
     \item \textbf{Memory Efficiency}: All models fit under 2.5GB with MLX INT4, enabling deployment on devices with 8GB RAM.
 
-    \item \textbf{Practical Implications}: MLX INT4 enables near real-time inference (100+ tok/s for smaller models) on consumer Apple Silicon devices.
+    \item \textbf{Practical Implications}: MLX INT4 enables near real-time inference (130+ tok/s for smaller models) on consumer Apple Silicon devices.
 \end{enumerate}
 
 \subsection{Ollama Inference Results}
 
-We benchmarked Qwen3.5 series using Ollama with Q4\_K\_M quantization. Table~\ref{tab:ollama_results} presents inference results in non-thinking mode.
+We benchmarked Qwen3.5 series using Ollama with Q4\_K\_M quantization. Table~\ref{tab:ollama_results} presents inference results.
 
 \begin{table}[H]
 \centering
-\caption{Ollama inference results. Energy measured using CodeCarbon.}
+\caption{Ollama Q4\_K\_M inference results. Energy measured using CodeCarbon.}
 \label{tab:ollama_results}
 \begin{tabular}{l|cccc}
 \toprule
-\textbf{Model} & \textbf{ms/token} & \textbf{tok/s} & \textbf{Energy (kWh)} & \textbf{Parameters} \\
+\textbf{Model} & \textbf{ms/token} & \textbf{tok/s} & \textbf{Energy (kWh)} & \textbf{Efficiency (tok/J)} \\
 \midrule
-Qwen3.5-0.8B & 36.71 & 27.24 & 0.000053 & 873M \\
-Qwen3.5-2B & 55.33 & 18.07 & 0.000141 & 2.27B \\
-Qwen3.5-4B & 188.78 & 5.30 & 0.000361 & 4.66B \\
-Phi-3 Mini & 76.68 & 13.04 & 0.000100 & 3.82B \\
+Qwen3.5-0.8B & 36.71 & 27.24 & 0.000053 & 524 \\
+Qwen3.5-2B & 55.33 & 18.07 & 0.000141 & 197 \\
+Qwen3.5-4B & 188.78 & 5.30 & 0.000361 & 77 \\
+Phi-3 Mini & 76.68 & 13.04 & 0.000100 & 278 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Qwen3.5-0.8B achieves highest throughput (27.24 tok/s) again due to it's size with lowest energy (0.000053 kWh) and Phi-3 Mini provides a decent middle ground at 13.04 tok/s via Ollama.
-
+Qwen3.5-0.8B achieves highest throughput (27.24 tok/s) with lowest energy (0.000053 kWh) via Ollama.
 
 \subsection{Energy Consumption}
 
-Table \ref{tab:energy} shows energy consumption measurements tracked by CodeCarbon during experiments.
+Table \ref{tab:mlx_energy} shows MLX energy consumption across quantization levels, measured using CodeCarbon during 100-token generation.
 
 \begin{table}[H]
 \centering
-\caption{Energy per inference (generating 100 tokens) measured using CodeCarbon. All models via Ollama.}
-\label{tab:energy}
-\begin{tabular}{l|ccc}
+\caption{MLX energy comparison across quantization levels (100 tokens).}
+\label{tab:mlx_energy}
+\begin{tabular}{l|ccccccc}
 \toprule
-\textbf{Model} & \textbf{Energy (kWh)} & \textbf{Energy (Joules)} & \textbf{Efficiency (tok/J)} \\
+\textbf{Model} & \multicolumn{2}{c}{\textbf{FP16}} & \multicolumn{2}{c}{\textbf{INT8}} & \multicolumn{2}{c}{\textbf{INT4}} & \textbf{Energy} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+& tok/s & kWh & tok/s & kWh & tok/s & kWh & Savings \\
 \midrule
-Qwen3.5-0.8B & 0.000053 & 190.8 & 524 \\
-Qwen3.5-2B & 0.000141 & 507.6 & 197 \\
-Qwen3.5-4B & 0.000361 & 1299.6 & 77 \\
-Phi-3 Mini & 0.000100 & 360.0 & 278 \\
+Qwen3.5-0.8B & 104.69 & 0.000013 & 166.08 & 0.000008 & 213.11 & 0.000006 & 2.2$\times$ \\
+Qwen3.5-2B & 52.08 & 0.000026 & 87.42 & 0.000015 & 131.86 & 0.000010 & 2.6$\times$ \\
+Qwen3.5-4B & 24.15 & 0.000056 & 42.49 & 0.000032 & 71.21 & 0.000019 & 2.9$\times$ \\
+Phi-3 Mini & -- & -- & 45.64 & 0.000030 & 88.40 & 0.000015 & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Energy efficiency (tokens per Joule) decreases with model size, Qwen3.5-0.8B achieves 524 tok/J, Qwen3.5-4B only 77 tok/J and Phi-3 Mini achieves 278 tok/J.
+INT4 quantization reduces energy consumption by 2.2$\times$ to 2.9$\times$ compared to FP16 within MLX.
+
+Table \ref{tab:framework_energy} compares energy efficiency between MLX and Ollama frameworks.
+
+\begin{table}[H]
+\centering
+\caption{Framework energy comparison: MLX INT4 vs Ollama Q4\_K\_M (100 tokens).}
+\label{tab:framework_energy}
+\begin{tabular}{l|cccccc}
+\toprule
+\textbf{Model} & \multicolumn{2}{c}{\textbf{MLX INT4}} & \multicolumn{2}{c}{\textbf{Ollama}} & \textbf{Energy} & \textbf{Speedup} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+& tok/s & kWh & tok/s & kWh & Savings & \\
+\midrule
+Qwen3.5-0.8B & 213.11 & 0.000006 & 27.24 & 0.000053 & 8.8$\times$ & 7.8$\times$ \\
+Qwen3.5-2B & 131.86 & 0.000010 & 18.07 & 0.000141 & 14.1$\times$ & 7.3$\times$ \\
+Qwen3.5-4B & 71.21 & 0.000019 & 5.30 & 0.000361 & 19.0$\times$ & 13.4$\times$ \\
+Phi-3 Mini & 88.40 & 0.000015 & 13.04 & 0.000100 & 6.7$\times$ & 6.8$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+MLX provides 6.7$\times$ to 19.0$\times$ energy savings compared to Ollama, while also delivering 6.8$\times$ to 13.4$\times$ higher throughput. This demonstrates MLX's superior efficiency for edge deployment on Apple Silicon.
 
 \subsection{Experimental Limitations}
 
@@ -566,11 +588,11 @@ Our experiments revealed several important limitations for edge inference on App
 Based on our experimental findings:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Model selection}: Qwen3.5-0.8B with MLX INT4 provides exceptional throughput (142.46 tok/s).
-
-    \item \textbf{Framework choice}: Use MLX for all models on Apple Silicon, with speedups from 7.4$\times$ (Phi-3 Mini) to 15.2$\times$ (Qwen3.5-4B) vs Ollama
-
-    \item \textbf{Memory constraints}: All models with MLX INT4 fit within 8GB (0.48GB to 2.47GB)
+    \item \textbf{Model selection}: Qwen3.5-0.8B with MLX INT4 provides exceptional throughput (213.11 tok/s) and energy efficiency (4.4 tok/J).
+    
+    \item \textbf{Framework choice}: Use MLX for all models on Apple Silicon, with speedups from 6.8$\times$ (Phi-3 Mini) to 13.4$\times$ (Qwen3.5-4B) vs Ollama.
+    
+    \item \textbf{Energy savings}: MLX INT4 provides 6.7$\times$ to 19.0$\times$ energy savings compared to Ollama.
 \end{enumerate}
 
 % =============================================================================
@@ -589,8 +611,8 @@ Apple's unified memory architecture gives it natural advantages for LLM inferenc
 \begin{itemize}[leftmargin=*,nosep]
     \item No GPU-CPU data transfer bottleneck
     \item 24GB unified memory accommodates all tested models in quantized form
-    \item Metal Performance Shaders enable 142.46 tok/s for Qwen3.5-0.8B INT4
-    \item Framework choice significantly impacts performance (MLX 5.2$\times$ faster than Ollama for Qwen3.5-0.8B)
+    \item Metal Performance Shaders enable 213.11 tok/s for Qwen3.5-0.8B INT4
+    \item Framework choice significantly impacts performance (MLX 7.8$\times$ faster than Ollama for Qwen3.5-0.8B)
 \end{itemize}
 
 
@@ -605,12 +627,12 @@ CodeCarbon measurements reveal a clear pattern:
     \item Apple M4 Pro estimated power: 42.5W CPU + 6W RAM (CodeCarbon model)
 \end{itemize}
 
-Energy efficiency varies with model size:
+Energy efficiency varies with model size and quantization:
 \begin{itemize}[leftmargin=*,nosep]
-    \item Qwen3.5-0.8B: 524 tokens/Joule (most efficient)
-    \item Qwen3.5-4B: 77 tokens/Joule
-    \item Phi-3 Mini: 278 tokens/Joule
-    \item Energy scales approximately linearly with parameter count
+    \item Qwen3.5-0.8B INT4: 4.4 tokens/Joule (most efficient)
+    \item Qwen3.5-4B INT4: 1.5 tokens/Joule
+    \item Phi-3 Mini INT4: 1.8 tokens/Joule
+    \item INT4 quantization improves energy efficiency by 2.2$\times$ to 2.9$\times$ over FP16
 \end{itemize}
 
 \subsection{Limitations}
@@ -663,11 +685,11 @@ Several directions deserve further work:
 We evaluated inference frameworks for deploying LLMs on Apple Silicon edge devices. Testing Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B parameters) on an M4 Pro with 24GB unified memory, we found:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Quantization benefits}: Within MLX, INT4 provides 1.66$\times$ to 2.61$\times$ speedup over FP16 with 3.5$\times$ memory reduction. Qwen3.5-0.8B achieves 142.46 tok/s with INT4 vs 85.79 tok/s with FP16.
-
-    \item \textbf{Framework comparison}: MLX INT4 outperforms Ollama Q4\_K\_M by 5.2$\times$ to 11.1$\times$ across all models. Qwen3.5-0.8B achieves 142.46 tok/s via MLX vs 27.24 tok/s via Ollama.
-
-    \item \textbf{Practical deployment}: All tested models with MLX INT4 fit within 2.5GB memory, enabling deployment on devices with 8GB RAM.
+    \item \textbf{Quantization benefits}: Within MLX, INT4 provides 2.0$\times$ to 2.9$\times$ speedup over FP16 with 3.5$\times$ memory reduction and 2.2$\times$ to 2.9$\times$ energy savings. Qwen3.5-0.8B achieves 213.11 tok/s with INT4 vs 104.69 tok/s with FP16.
+    
+    \item \textbf{Framework comparison}: MLX INT4 outperforms Ollama Q4\_K\_M by 6.8$\times$ to 13.4$\times$ in throughput and provides 6.7$\times$ to 19.0$\times$ energy savings across all models.
+    
+    \item \textbf{Practical deployment}: All tested models with MLX INT4 fit within 2.5GB memory, enabling deployment on devices with 8GB RAM while maintaining high throughput.
 \end{enumerate}
 
 As data center energy consumption approaches 945 TWh annually, edge deployment will surely play a massive role in the upcoming future. Choosing the correct framework would impact performance by a lot.

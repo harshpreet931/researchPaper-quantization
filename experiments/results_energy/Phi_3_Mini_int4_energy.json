@@ -1,0 +1,17 @@
+{
+  "model": "Phi-3-Mini",
+  "quant_method": "int4",
+  "model_path": "mlx-community/Phi-3-mini-4k-instruct-4bit",
+  "num_tokens": 100,
+  "timestamp": "2026-03-13T10:53:03.949292",
+  "load_time_seconds": 0.9152350425720215,
+  "parameters": 597212160,
+  "model_size_gb": 2.002012252807617,
+  "total_time_seconds": 1.131159332988318,
+  "ms_per_token": 11.31159332988318,
+  "tokens_per_second": 88.40487549690998,
+  "emissions_kg": 1.0875410565238803e-05,
+  "energy_kwh": 1.5243601874911594e-05,
+  "tokens_per_joule": 1.8222581516967673,
+  "status": "success"
+}

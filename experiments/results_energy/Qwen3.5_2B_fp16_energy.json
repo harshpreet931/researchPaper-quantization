@@ -1,0 +1,17 @@
+{
+  "model": "Qwen3.5-2B",
+  "quant_method": "fp16",
+  "model_path": "Qwen/Qwen3.5-2B",
+  "num_tokens": 100,
+  "timestamp": "2026-03-13T10:52:18.167742",
+  "load_time_seconds": 1.8381738662719727,
+  "parameters": 1881825088,
+  "model_size_gb": 3.5051771998405457,
+  "total_time_seconds": 1.9202334170113318,
+  "ms_per_token": 19.202334170113318,
+  "tokens_per_second": 52.07700226134013,
+  "emissions_kg": 1.8458734283817216e-05,
+  "energy_kwh": 2.5872825200426128e-05,
+  "tokens_per_joule": 1.0736275440580905,
+  "status": "success"
+}

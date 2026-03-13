@@ -1,0 +1,17 @@
+{
+  "model": "Qwen3.5-2B",
+  "quant_method": "int8",
+  "model_path": "mlx-community/Qwen3.5-2B-8bit",
+  "num_tokens": 100,
+  "timestamp": "2026-03-13T10:52:54.680290",
+  "load_time_seconds": 1.6187870502471924,
+  "parameters": 529657664,
+  "model_size_gb": 1.862602412700653,
+  "total_time_seconds": 1.1438986249850132,
+  "ms_per_token": 11.438986249850132,
+  "tokens_per_second": 87.42033412384787,
+  "emissions_kg": 1.0998240734975384e-05,
+  "energy_kwh": 1.5415767715866323e-05,
+  "tokens_per_joule": 1.8019068715720294,
+  "status": "success"
+}
