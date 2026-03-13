@@ -450,6 +450,28 @@ Phi-3 Mini & 3.82B & 2.28 & MLX INT4 \\
 
 Model sizes measured directly from loaded weights in quantized formats. With MLX 0.31.0, all models are fully supported with INT4 quantization.
 
+\subsection{Quantization Method Comparison}
+
+Table \ref{tab:quant_comparison} compares different quantization methods on Qwen3.5-0.8B, demonstrating the trade-offs between precision, speed, and energy efficiency.
+
+\begin{table}[H]
+\centering
+\caption{Quantization method comparison for Qwen3.5-0.8B on Apple Silicon M4 Pro (100 tokens).}
+\label{tab:quant_comparison}
+\begin{tabular}{l|ccccccc}
+\toprule
+\textbf{Method} & \textbf{Framework} & \textbf{Size (GB)} & \textbf{tok/s} & \textbf{ms/tok} & \textbf{Energy (kWh)} & \textbf{tok/J} & \textbf{Speedup} \\
+\midrule
+FP16 & MLX & 1.40 & 108.12 & 9.25 & 0.000012 & 2.2 & 1.0$\times$ \\
+INT8 & MLX & 0.74 & 164.71 & 6.07 & 0.000008 & 3.4 & 1.5$\times$ \\
+INT4 & MLX & 0.39 & 218.93 & 4.57 & 0.000006 & 4.5 & 2.0$\times$ \\
+Q4\_K\_M & Ollama & 0.52 & 27.24 & 36.71 & 0.000053 & 0.5 & 0.3$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Key observations: (1) MLX INT4 achieves 2.0$\times$ speedup and 2.0$\times$ energy savings compared to FP16; (2) Ollama Q4\_K\_M shows significantly lower throughput (8.0$\times$ slower than MLX INT4) due to different quantization scheme and framework overhead; (3) Memory footprint decreases proportionally with bit-width reduction.
+
 \subsection{Latency Analysis}
 
 Table \ref{tab:latency} presents inference latency from real experiments.
@@ -517,17 +539,17 @@ We benchmarked Qwen3.5 series using Ollama with Q4\_K\_M quantization. Table~\re
 \label{tab:ollama_results}
 \begin{tabular}{l|cccc}
 \toprule
-\textbf{Model} & \textbf{ms/token} & \textbf{tok/s} & \textbf{Energy (kWh)} & \textbf{Efficiency (tok/J)} \\
+\textbf{Model} & \textbf{ms/token} & \textbf{tok/s} & \textbf{Energy (kWh)} & \textbf{Parameters} \\
 \midrule
-Qwen3.5-0.8B & 36.71 & 27.24 & 0.000053 & 524 \\
-Qwen3.5-2B & 55.33 & 18.07 & 0.000141 & 197 \\
-Qwen3.5-4B & 188.78 & 5.30 & 0.000361 & 77 \\
-Phi-3 Mini & 76.68 & 13.04 & 0.000100 & 278 \\
+Qwen3.5-0.8B & 36.71 & 27.24 & 0.000053 & 873M \\
+Qwen3.5-2B & 55.33 & 18.07 & 0.000141 & 2.27B \\
+Qwen3.5-4B & 188.78 & 5.30 & 0.000361 & 4.66B \\
+Phi-3 Mini & 76.68 & 13.04 & 0.000100 & 3.82B \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Qwen3.5-0.8B achieves highest throughput (27.24 tok/s) with lowest energy (0.000053 kWh) via Ollama.
+Qwen3.5-0.8B achieves highest throughput (27.24 tok/s) with lowest energy (0.000053 kWh) via Ollama. See Table \ref{tab:quant_comparison} for efficiency comparison using consistent token counts.
 
 \subsection{Energy Consumption}
 
