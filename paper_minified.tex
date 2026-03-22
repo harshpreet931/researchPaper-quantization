@@ -157,7 +157,7 @@ LLMs have changed the natural language processing landscape, by bringing remarka
 
 LLMs have quite a lot of environmental costs across their entire lifecycle. Training and inference account for most operational energy consumption in production \cite{patterson2021carbon}. As models grow larger to improve performance, energy will also increase, which creates a thin line between capability and sustainability.
 
-For this, in Edge computing we have a solution, it offers lower latency, more privacy, and a lot of energy savings through local computation \cite{shi2016edge}. But, deploying LLMs on edge devices is hard, quite hard. Memory, compute, power everything is limited, and it also can't scale very much. A 4 billion param model in FP16 needs about 8GB just for weights and decent amount of RAM, more than what many edge devices can handle. 
+For this, in Edge computing we have a solution, it offers lower latency, more privacy, and a lot of energy savings through local computation \cite{shi2016edge}. But, deploying LLMs on edge devices is hard, quite hard. Memory, compute, power everything is limited, and it also can't scale very much. A 4 billion param model in FP16 needs about 8GB just for weights and decent amount of RAM, more than what many edge devices can handle.
 
 \subsection{Quantization Challenge}
 
@@ -191,7 +191,7 @@ These findings have an immediate value, as organizations can reduce inference en
 % =============================================================================
 \section{Background}
 
-The impact of LLMs has become a critical research frontier especially in environmental sustainability. Training large models emits substantial amounts of carbon dioxide, and inference dominates operational energy consumption, accounting for approximately 60\% of total ML compute usage in production systems \cite{patterson2021carbon}. Moving workloads to the edge offers significant benefits \cite{shi2016edge}. However, edge devices have constraints: they have limited memory (8--16\,GB typical) and lower compute capabilities. 
+The impact of LLMs has become a critical research frontier especially in environmental sustainability. Training large models emits substantial amounts of carbon dioxide, and inference dominates operational energy consumption, accounting for approximately 60\% of total ML compute usage in production systems \cite{patterson2021carbon}. Moving workloads to the edge offers significant benefits \cite{shi2016edge}. However, edge devices have constraints: they have limited memory (8--16\,GB typical) and lower compute capabilities.
 
 \subsection{Model Compression Techniques}
 
@@ -622,9 +622,9 @@ Based on our experimental findings:
 
 \begin{enumerate}[leftmargin=*,nosep]
     \item \textbf{Model selection}: Qwen3.5-0.8B with MLX INT4 provides exceptional throughput (213.11 tok/s) and energy efficiency (4.4 tok/J).
-    
+
     \item \textbf{Framework choice}: Use MLX for all models on Apple Silicon, with speedups from 6.8$\times$ (Phi-3 Mini) to 13.4$\times$ (Qwen3.5-4B) vs Ollama.
-    
+
     \item \textbf{Energy savings}: MLX INT4 provides 6.7$\times$ to 19.0$\times$ energy savings compared to Ollama.
 \end{enumerate}
 
@@ -720,9 +720,9 @@ We evaluated inference frameworks for deploying LLMs on Apple Silicon edge devic
 
 \begin{enumerate}[leftmargin=*,nosep]
     \item \textbf{Quantization benefits}: Within MLX, INT4 provides 2.0$\times$ to 3.8$\times$ speedup over FP16 with 3.5$\times$--3.6$\times$ memory reduction and 2.2$\times$ to 3.9$\times$ energy savings. Qwen3.5-0.8B achieves 213.11 tok/s with INT4 vs 104.69 tok/s with FP16.
-    
+
     \item \textbf{Framework comparison}: MLX INT4 outperforms Ollama Q4\_K\_M by 6.8$\times$ to 13.4$\times$ in throughput and provides 6.7$\times$ to 19.0$\times$ energy savings across all models.
-    
+
     \item \textbf{Practical deployment}: All tested models with MLX INT4 fit within 2.5GB memory, enabling deployment on devices with 8GB RAM while maintaining high throughput.
 \end{enumerate}
 
