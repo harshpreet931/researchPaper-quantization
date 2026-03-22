@@ -1041,15 +1041,15 @@ We evaluated inference frameworks for deploying LLMs on Apple Silicon edge devic
     \item \textbf{Practical deployment}: All tested models with MLX INT4 fit within 2.5GB memory, enabling deployment on devices with 8GB RAM while maintaining high throughput.
 \end{enumerate}
 
-\subsubsection{Why INT4 Quantization Excels}
+\subsection{Why INT4 Quantization Excels}
 
 INT4 quantization reduces memory bandwidth requirements by 4$\times$ compared to FP16, enabling more weights to fit in cache hierarchy and reducing memory-bound stalls. For the models tested, this translates to 2.0$\times$--3.8$\times$ throughput improvement (Table~\ref{tab:latency}) while maintaining accuracy for sub-5B parameter models.
 
-\subsubsection{Why MLX Outperforms Ollama}
+\subsection{Why MLX Outperforms Ollama}
 
 MLX's direct INT4 implementation leverages Metal Performance Shaders for native execution, whereas Ollama's GGUF-based block quantization introduces dequantization overhead during inference. This architectural difference produces 6.8$\times$--13.4$\times$ higher throughput and 6.7$\times$--19.0$\times$ energy savings across all models (Table~\ref{tab:framework_energy}).
 
-\subsubsection{Real-World Impact}
+\subsection{Real-World Impact}
 
 Our findings enable several practical applications:
 \begin{itemize}[leftmargin=*,nosep]
