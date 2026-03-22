@@ -399,6 +399,45 @@ Several tools have been developed for measuring energy consumption in ML workloa
 
 In Apple Silicon energy measurement is challenging due to the unified memory architecture and limited software interfaces. We are going to address this through Apple's powerlog framework and CodeCarbon's macOS support.
 
+% Comparison table of related work
+\begin{table*}[t]
+\centering
+\caption{Comparison of Related Work in PTQ, Edge Deployment, and Energy Measurement}
+\label{tab:related_work_comparison}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l l c l l l l}
+\toprule
+\textbf{Category} & \textbf{Method/Study} & \textbf{Year} & \textbf{Key Features} & \textbf{Limitations} & \textbf{Hardware} & \textbf{Ref} \\
+\midrule
+\multicolumn{7}{l}{\textit{PTQ Methods}} \\
+\midrule
+ & LLM.int8() & 2022 & Mixed-precision, outlier detection & Computational overhead & Hardware-agnostic & \cite{dettmers2022llm} \\
+ & GPTQ & 2023 & OBS-based, Hessian compensation & Expensive calibration & Hardware-agnostic & \cite{frantar2022gptq} \\
+ & AWQ & 2024 & Activation-aware, salient weights & Requires calibration data & Hardware-agnostic & \cite{lin2023awq} \\
+ & INT4 Weight-Only & — & Simple 4-bit quantization & Accuracy loss for large models & Hardware-agnostic & — \\
+\midrule
+\multicolumn{7}{l}{\textit{Edge Frameworks}} \\
+\midrule
+ & llama.cpp & 2023 & GGUF format, CPU-optimized & Limited GPU initially & CPU, GPU, Metal & \cite{llamacpp2023} \\
+ & MLC-LLM & 2023 & TVM compilation, cross-platform & Complex setup & GPU, Metal, Vulkan & \cite{mlcllm2023} \\
+ & Huang et al. & 2025 & 28 models, Raspberry Pi 4 & Hardware-specific & Edge devices & \cite{huang2025llms} \\
+ & Benazir \& Lin & 2025 & Apple Silicon profiling & Apple-only & Apple Silicon & \cite{benazir2025profiling} \\
+\midrule
+\multicolumn{7}{l}{\textit{Small Language Models}} \\
+\midrule
+ & Phi Series & 2023-2024 & Compact, high capability & Limited general knowledge & Universal & \cite{javaheripi2023phi2,abdin2024phi3} \\
+ & Qwen Series & 2025 & 0.8B-397B range, multilingual & Larger models need resources & Universal & \cite{qwen2025technical} \\
+\midrule
+\multicolumn{7}{l}{\textit{Energy Measurement}} \\
+\midrule
+ & CodeCarbon & 2023 & Multi-platform, easy integration & ±10-15\% accuracy & Multi-platform & \cite{codecarbon2023} \\
+ & RAPL & 2010 & Intel MSR-based, real-time & Intel/AMD only & Intel/AMD CPUs & \cite{david2010rapl} \\
+ & Hardware Power Meters & 2023 & Physical measurement, accurate & External hardware needed & External device & \cite{conti2023multiport} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
 % =============================================================================
 % 4. METHODOLOGY
 % =============================================================================
