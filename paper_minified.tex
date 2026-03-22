@@ -91,6 +91,12 @@
 \pgfplotsset{compat=1.17}
 
 % -----------------------------------------------------------------------------
+% TIKZ DIAGRAMS
+% -----------------------------------------------------------------------------
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, backgrounds, calc}
+
+% -----------------------------------------------------------------------------
 % CUSTOM COMMANDS
 % -----------------------------------------------------------------------------
 \newcommand{\cmark}{\ding{51}}
@@ -185,6 +191,79 @@ We will address these questions via experiments on Apple Silicon. Our contributi
 \end{enumerate}
 
 These findings have an immediate value, as organizations can reduce inference energy costs while maintaining model performance.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=0.6cm and 0.3cm,
+    box/.style={
+        rectangle,
+        rounded corners=3pt,
+        draw,
+        minimum width=2.2cm,
+        minimum height=0.7cm,
+        align=center,
+        font=\footnotesize
+    },
+    layerbox/.style={
+        rectangle,
+        rounded corners=5pt,
+        draw,
+        thick
+    },
+    arrow/.style={
+        -{Latex[length=2mm, width=1.5mm]},
+        thick
+    }
+]
+
+% === Layer 1: Context (Blue) ===
+\node[box, fill=blue!15, draw=blue!60] (energy) {Energy\\Consumption};
+\node[box, fill=blue!15, draw=blue!60, right=of energy] (carbon) {Carbon\\Footprint};
+\node[box, fill=blue!15, draw=blue!60, right=of carbon] (edge) {Edge\\Constraints};
+
+% === Layer 2: Solution (Purple) ===
+\node[box, fill=purple!15, draw=purple!60, below=1.2cm of carbon] (ptq) {PTQ\\Compression};
+\node[box, fill=purple!15, draw=purple!60, right=of ptq] (int4) {INT4\\Quantization};
+\node[box, fill=purple!15, draw=purple!60, left=of ptq] (edge2) {Edge\\Computing};
+
+% === Layer 3: Platform (Orange) ===
+\node[box, fill=orange!20, draw=orange!70, below=1.2cm of ptq] (m4) {M4 Pro\\Chip};
+\node[box, fill=orange!20, draw=orange!70, right=of m4] (mem) {Unified\\Memory (24GB)};
+\node[box, fill=orange!20, draw=orange!70, left=of m4] (mlx) {Apple\\MLX};
+
+% === Layer 4: Evaluation (Teal/Green) ===
+\node[box, fill=teal!20, draw=teal!70, below=1.2cm of m4, minimum width=2.8cm] (memory) {Memory: 3.5$\times$--3.6$\times$\\Reduction};
+\node[box, fill=teal!20, draw=teal!70, right=of memory, minimum width=2.8cm] (speed) {Speed: 2.0$\times$--3.8$\times$\\Faster (INT4 vs FP16)};
+\node[box, fill=teal!20, draw=teal!70, left=of memory, minimum width=2.8cm] (energy2) {Energy: 6.7$\times$--19.0$\times$\\Savings (vs Ollama)};
+
+% === Arrows: Context → Solution ===
+\draw[arrow, blue!60] (energy.south) -- ++(0,-0.3) -| (edge2.north);
+\draw[arrow, blue!60] (carbon.south) -- (ptq.north);
+\draw[arrow, blue!60] (edge.south) -- ++(0,-0.3) -| (int4.north);
+
+% === Arrows: Solution → Platform ===
+\draw[arrow, purple!60] (edge2.south) -- ++(0,-0.3) -| (mlx.north);
+\draw[arrow, purple!60] (ptq.south) -- (m4.north);
+\draw[arrow, purple!60] (int4.south) -- ++(0,-0.3) -| (mem.north);
+
+% === Arrows: Platform → Evaluation ===
+\draw[arrow, orange!70] (mlx.south) -- ++(0,-0.3) -| (energy2.north);
+\draw[arrow, orange!70] (m4.south) -- (memory.north);
+\draw[arrow, orange!70] (mem.south) -- ++(0,-0.3) -| (speed.north);
+
+% === Layer Labels (left side) ===
+\node[font=\scriptsize\bfseries, text=blue!70, left=0.8cm of energy] {Context};
+\node[font=\scriptsize\bfseries, text=purple!70, left=0.8cm of edge2] {Solution};
+\node[font=\scriptsize\bfseries, text=orange!80, left=0.8cm of mlx] {Platform};
+\node[font=\scriptsize\bfseries, text=teal!70, left=0.8cm of energy2] {Results};
+
+\end{tikzpicture}
+\caption{Conceptual framework for PTQ-based edge AI deployment on Apple Silicon.}
+\label{fig:framework}
+\end{figure}
+
+Figure~\ref{fig:framework} illustrates our conceptual framework for enabling efficient LLM inference on edge devices. The framework addresses the growing environmental impact of LLM deployment through PTQ compression techniques optimized for Apple Silicon hardware. Our evaluation demonstrates that INT4 quantization achieves 3.5$\times$--3.6$\times$ memory reduction while providing 2.0$\times$--3.8$\times$ speedup over full-precision inference. The Apple MLX framework delivers 6.7$\times$--19.0$\times$ energy savings compared to Ollama, enabling practical edge deployment of language models on consumer hardware with limited memory budgets.
 
 % =============================================================================
 % 2. BACKGROUND
