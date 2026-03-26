@@ -1,0 +1,1292 @@
+{
+  "model": "Phi-3-Mini",
+  "quant_method": "fp16",
+  "model_path": "microsoft/Phi-3-mini-4k-instruct",
+  "method": "logit_scoring",
+  "timestamp": "2026-03-24T19:34:40.841475",
+  "num_questions": 100,
+  "load_time_seconds": 478.9358010292053,
+  "parameters": 3821079552,
+  "model_size_gb": 7.117315292358398,
+  "overall_accuracy": 78.0,
+  "correct": 78,
+  "total": 100,
+  "unparseable": 0,
+  "per_subject": {
+    "abstract_algebra": {
+      "correct": 5,
+      "total": 10,
+      "accuracy": 50.0
+    },
+    "college_physics": {
+      "correct": 4,
+      "total": 10,
+      "accuracy": 40.0
+    },
+    "computer_security": {
+      "correct": 10,
+      "total": 10,
+      "accuracy": 100.0
+    },
+    "philosophy": {
+      "correct": 10,
+      "total": 10,
+      "accuracy": 100.0
+    },
+    "world_religions": {
+      "correct": 7,
+      "total": 10,
+      "accuracy": 70.0
+    },
+    "high_school_psychology": {
+      "correct": 9,
+      "total": 10,
+      "accuracy": 90.0
+    },
+    "sociology": {
+      "correct": 9,
+      "total": 10,
+      "accuracy": 90.0
+    },
+    "clinical_knowledge": {
+      "correct": 9,
+      "total": 10,
+      "accuracy": 90.0
+    },
+    "management": {
+      "correct": 7,
+      "total": 10,
+      "accuracy": 70.0
+    },
+    "marketing": {
+      "correct": 8,
+      "total": 10,
+      "accuracy": 80.0
+    }
+  },
+  "per_category": {
+    "STEM": {
+      "correct": 19,
+      "total": 30,
+      "accuracy": 63.33333333333333
+    },
+    "Other": {
+      "correct": 24,
+      "total": 30,
+      "accuracy": 80.0
+    },
+    "Social Sciences": {
+      "correct": 18,
+      "total": 20,
+      "accuracy": 90.0
+    },
+    "Humanities": {
+      "correct": 17,
+      "total": 20,
+      "accuracy": 85.0
+    }
+  },
+  "question_results": [
+    {
+      "subject": "marketing",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 33.25,
+        "B": 30.75,
+        "C": 40.25,
+        "D": 30.0
+      }
+    },
+    {
+      "subject": "clinical_knowledge",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 40.0,
+        "B": 37.25,
+        "C": 42.75,
+        "D": 33.75
+      }
+    },
+    {
+      "subject": "abstract_algebra",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 40.75,
+        "B": 44.5,
+        "C": 38.25,
+        "D": 39.5
+      }
+    },
+    {
+      "subject": "college_physics",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 38.0,
+        "B": 36.25,
+        "C": 41.25,
+        "D": 33.25
+      }
+    },
+    {
+      "subject": "philosophy",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 35.0,
+        "B": 41.75,
+        "C": 30.5,
+        "D": 31.125
+      }
+    },
+    {
+      "subject": "computer_security",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 34.25,
+        "B": 34.75,
+        "C": 39.75,
+        "D": 31.125
+      }
+    },
+    {
+      "subject": "computer_security",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 35.75,
+        "B": 41.0,
+        "C": 31.5,
+        "D": 30.75
+      }
+    },
+    {
+      "subject": "world_religions",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 37.5,
+        "B": 31.625,
+        "C": 37.0,
+        "D": 31.375
+      }
+    },
+    {
+      "subject": "high_school_psychology",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 34.25,
+        "B": 30.75,
+        "C": 32.25,
+        "D": 41.5
+      }
+    },
+    {
+      "subject": "marketing",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 46.0,
+        "B": 41.25,
+        "C": 41.5,
+        "D": 45.0
+      }
+    },
+    {
+      "subject": "clinical_knowledge",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 44.75,
+        "B": 45.25,
+        "C": 44.5,
+        "D": 42.75
+      }
+    },
+    {
+      "subject": "sociology",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 42.75,
+        "B": 36.0,
+        "C": 33.25,
+        "D": 33.5
+      }
+    },
+    {
+      "subject": "high_school_psychology",
+      "correct_answer": "D",
+      "model_answer": "C",
+      "is_correct": false,
+      "logits": {
+        "A": 45.0,
+        "B": 45.0,
+        "C": 46.0,
+        "D": 46.0
+      }
+    },
+    {
+      "subject": "sociology",
+      "correct_answer": "C",
+      "model_answer": "A",
+      "is_correct": false,
+      "logits": {
+        "A": 45.0,
+        "B": 42.25,
+        "C": 42.75,
+        "D": 44.25
+      }
+    },
+    {
+      "subject": "world_religions",
+      "correct_answer": "A",
+      "model_answer": "C",
+      "is_correct": false,
+      "logits": {
+        "A": 44.75,
+        "B": 44.0,
+        "C": 45.0,
+        "D": 44.75
+      }
+    },
+    {
+      "subject": "abstract_algebra",
+      "correct_answer": "B",
+      "model_answer": "D",
+      "is_correct": false,
+      "logits": {
+        "A": 41.75,
+        "B": 47.75,
+        "C": 43.25,
+        "D": 48.25
+      }
+    },
+    {
+      "subject": "management",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 40.0,
+        "B": 36.0,
+        "C": 36.0,
+        "D": 43.5
+      }
+    },
+    {
+      "subject": "philosophy",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 43.0,
+        "B": 42.5,
+        "C": 44.75,
+        "D": 40.25
+      }
+    },
+    {
+      "subject": "sociology",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 36.5,
+        "B": 41.5,
+        "C": 35.25,
+        "D": 34.0
+      }
+    },
+    {
+      "subject": "abstract_algebra",
+      "correct_answer": "B",
+      "model_answer": "D",
+      "is_correct": false,
+      "logits": {
+        "A": 46.25,
+        "B": 46.0,
+        "C": 46.5,
+        "D": 49.0
+      }
+    },
+    {
+      "subject": "high_school_psychology",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 34.75,
+        "B": 41.0,
+        "C": 29.375,
+        "D": 28.5
+      }
+    },
+    {
+      "subject": "philosophy",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 40.5,
+        "B": 40.75,
+        "C": 40.0,
+        "D": 45.25
+      }
+    },
+    {
+      "subject": "sociology",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 38.0,
+        "B": 30.75,
+        "C": 29.875,
+        "D": 28.375
+      }
+    },
+    {
+      "subject": "clinical_knowledge",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 41.25,
+        "B": 44.5,
+        "C": 39.5,
+        "D": 40.25
+      }
+    },
+    {
+      "subject": "philosophy",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 44.75,
+        "B": 43.5,
+        "C": 43.0,
+        "D": 44.5
+      }
+    },
+    {
+      "subject": "computer_security",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 34.5,
+        "B": 32.0,
+        "C": 38.75,
+        "D": 30.75
+      }
+    },
+    {
+      "subject": "computer_security",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 41.25,
+        "B": 34.0,
+        "C": 32.5,
+        "D": 36.0
+      }
+    },
+    {
+      "subject": "world_religions",
+      "correct_answer": "C",
+      "model_answer": "B",
+      "is_correct": false,
+      "logits": {
+        "A": 35.0,
+        "B": 39.5,
+        "C": 34.0,
+        "D": 32.25
+      }
+    },
+    {
+      "subject": "abstract_algebra",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 46.5,
+        "B": 43.5,
+        "C": 44.0,
+        "D": 49.0
+      }
+    },
+    {
+      "subject": "philosophy",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 44.5,
+        "B": 39.25,
+        "C": 43.5,
+        "D": 37.5
+      }
+    },
+    {
+      "subject": "college_physics",
+      "correct_answer": "B",
+      "model_answer": "D",
+      "is_correct": false,
+      "logits": {
+        "A": 41.25,
+        "B": 40.0,
+        "C": 36.75,
+        "D": 44.5
+      }
+    },
+    {
+      "subject": "management",
+      "correct_answer": "D",
+      "model_answer": "A",
+      "is_correct": false,
+      "logits": {
+        "A": 42.75,
+        "B": 39.5,
+        "C": 38.25,
+        "D": 42.5
+      }
+    },
+    {
+      "subject": "high_school_psychology",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 31.25,
+        "B": 38.25,
+        "C": 28.625,
+        "D": 26.625
+      }
+    },
+    {
+      "subject": "management",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 42.75,
+        "B": 35.75,
+        "C": 36.0,
+        "D": 35.0
+      }
+    },
+    {
+      "subject": "management",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 30.125,
+        "B": 28.0,
+        "C": 38.75,
+        "D": 27.125
+      }
+    },
+    {
+      "subject": "computer_security",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 35.75,
+        "B": 32.5,
+        "C": 42.5,
+        "D": 32.5
+      }
+    },
+    {
+      "subject": "abstract_algebra",
+      "correct_answer": "A",
+      "model_answer": "D",
+      "is_correct": false,
+      "logits": {
+        "A": 48.25,
+        "B": 46.75,
+        "C": 48.0,
+        "D": 49.25
+      }
+    },
+    {
+      "subject": "college_physics",
+      "correct_answer": "D",
+      "model_answer": "B",
+      "is_correct": false,
+      "logits": {
+        "A": 47.75,
+        "B": 48.5,
+        "C": 47.25,
+        "D": 47.5
+      }
+    },
+    {
+      "subject": "philosophy",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 39.0,
+        "B": 42.25,
+        "C": 35.75,
+        "D": 33.5
+      }
+    },
+    {
+      "subject": "sociology",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 32.0,
+        "B": 32.75,
+        "C": 40.0,
+        "D": 30.0
+      }
+    },
+    {
+      "subject": "clinical_knowledge",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 47.5,
+        "B": 45.25,
+        "C": 45.75,
+        "D": 43.25
+      }
+    },
+    {
+      "subject": "marketing",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 40.5,
+        "B": 42.5,
+        "C": 38.5,
+        "D": 39.0
+      }
+    },
+    {
+      "subject": "marketing",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 40.5,
+        "B": 41.25,
+        "C": 40.0,
+        "D": 45.75
+      }
+    },
+    {
+      "subject": "world_religions",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 37.25,
+        "B": 27.5,
+        "C": 27.375,
+        "D": 27.375
+      }
+    },
+    {
+      "subject": "clinical_knowledge",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 41.5,
+        "B": 39.0,
+        "C": 42.75,
+        "D": 46.5
+      }
+    },
+    {
+      "subject": "clinical_knowledge",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 35.0,
+        "B": 33.5,
+        "C": 41.0,
+        "D": 32.25
+      }
+    },
+    {
+      "subject": "college_physics",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 45.25,
+        "B": 38.25,
+        "C": 38.75,
+        "D": 38.25
+      }
+    },
+    {
+      "subject": "sociology",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 27.75,
+        "B": 37.5,
+        "C": 26.75,
+        "D": 26.25
+      }
+    },
+    {
+      "subject": "management",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 37.0,
+        "B": 35.25,
+        "C": 35.25,
+        "D": 44.75
+      }
+    },
+    {
+      "subject": "abstract_algebra",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 46.0,
+        "B": 44.0,
+        "C": 45.5,
+        "D": 48.25
+      }
+    },
+    {
+      "subject": "computer_security",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 35.0,
+        "B": 32.75,
+        "C": 39.75,
+        "D": 30.5
+      }
+    },
+    {
+      "subject": "college_physics",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 46.5,
+        "B": 47.5,
+        "C": 47.75,
+        "D": 47.75
+      }
+    },
+    {
+      "subject": "marketing",
+      "correct_answer": "A",
+      "model_answer": "B",
+      "is_correct": false,
+      "logits": {
+        "A": 44.25,
+        "B": 45.25,
+        "C": 44.5,
+        "D": 40.75
+      }
+    },
+    {
+      "subject": "marketing",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 42.0,
+        "B": 39.5,
+        "C": 45.25,
+        "D": 41.0
+      }
+    },
+    {
+      "subject": "abstract_algebra",
+      "correct_answer": "C",
+      "model_answer": "D",
+      "is_correct": false,
+      "logits": {
+        "A": 43.5,
+        "B": 42.25,
+        "C": 42.5,
+        "D": 44.0
+      }
+    },
+    {
+      "subject": "computer_security",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 43.25,
+        "B": 38.5,
+        "C": 36.5,
+        "D": 35.5
+      }
+    },
+    {
+      "subject": "world_religions",
+      "correct_answer": "A",
+      "model_answer": "C",
+      "is_correct": false,
+      "logits": {
+        "A": 43.5,
+        "B": 42.0,
+        "C": 44.25,
+        "D": 42.0
+      }
+    },
+    {
+      "subject": "management",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 42.0,
+        "B": 31.875,
+        "C": 30.75,
+        "D": 31.625
+      }
+    },
+    {
+      "subject": "clinical_knowledge",
+      "correct_answer": "D",
+      "model_answer": "B",
+      "is_correct": false,
+      "logits": {
+        "A": 42.75,
+        "B": 44.0,
+        "C": 43.75,
+        "D": 43.25
+      }
+    },
+    {
+      "subject": "sociology",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 37.0,
+        "B": 36.25,
+        "C": 38.75,
+        "D": 42.0
+      }
+    },
+    {
+      "subject": "philosophy",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 41.0,
+        "B": 40.75,
+        "C": 43.5,
+        "D": 43.5
+      }
+    },
+    {
+      "subject": "high_school_psychology",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 43.0,
+        "B": 42.5,
+        "C": 43.5,
+        "D": 45.25
+      }
+    },
+    {
+      "subject": "world_religions",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 40.25,
+        "B": 40.0,
+        "C": 39.75,
+        "D": 36.25
+      }
+    },
+    {
+      "subject": "clinical_knowledge",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 39.75,
+        "B": 42.75,
+        "C": 43.0,
+        "D": 38.5
+      }
+    },
+    {
+      "subject": "abstract_algebra",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 44.75,
+        "B": 45.0,
+        "C": 47.25,
+        "D": 47.25
+      }
+    },
+    {
+      "subject": "philosophy",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 36.25,
+        "B": 42.5,
+        "C": 33.5,
+        "D": 34.0
+      }
+    },
+    {
+      "subject": "high_school_psychology",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 43.25,
+        "B": 40.25,
+        "C": 38.5,
+        "D": 46.75
+      }
+    },
+    {
+      "subject": "world_religions",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 41.75,
+        "B": 39.75,
+        "C": 41.75,
+        "D": 45.5
+      }
+    },
+    {
+      "subject": "world_religions",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 39.25,
+        "B": 39.0,
+        "C": 37.0,
+        "D": 44.75
+      }
+    },
+    {
+      "subject": "abstract_algebra",
+      "correct_answer": "C",
+      "model_answer": "D",
+      "is_correct": false,
+      "logits": {
+        "A": 43.0,
+        "B": 43.5,
+        "C": 43.25,
+        "D": 44.25
+      }
+    },
+    {
+      "subject": "marketing",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 36.5,
+        "B": 33.75,
+        "C": 33.25,
+        "D": 44.5
+      }
+    },
+    {
+      "subject": "computer_security",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 34.25,
+        "B": 35.5,
+        "C": 41.0,
+        "D": 33.25
+      }
+    },
+    {
+      "subject": "college_physics",
+      "correct_answer": "A",
+      "model_answer": "B",
+      "is_correct": false,
+      "logits": {
+        "A": 45.25,
+        "B": 47.25,
+        "C": 42.25,
+        "D": 46.75
+      }
+    },
+    {
+      "subject": "college_physics",
+      "correct_answer": "C",
+      "model_answer": "B",
+      "is_correct": false,
+      "logits": {
+        "A": 42.0,
+        "B": 45.0,
+        "C": 41.25,
+        "D": 43.5
+      }
+    },
+    {
+      "subject": "abstract_algebra",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 45.5,
+        "B": 44.25,
+        "C": 45.25,
+        "D": 48.25
+      }
+    },
+    {
+      "subject": "college_physics",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 45.5,
+        "B": 39.25,
+        "C": 38.0,
+        "D": 42.5
+      }
+    },
+    {
+      "subject": "marketing",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 43.25,
+        "B": 42.25,
+        "C": 39.25,
+        "D": 47.0
+      }
+    },
+    {
+      "subject": "sociology",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 34.0,
+        "B": 32.75,
+        "C": 41.25,
+        "D": 31.875
+      }
+    },
+    {
+      "subject": "management",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 40.25,
+        "B": 37.5,
+        "C": 37.0,
+        "D": 44.0
+      }
+    },
+    {
+      "subject": "computer_security",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 40.0,
+        "B": 42.75,
+        "C": 41.25,
+        "D": 40.25
+      }
+    },
+    {
+      "subject": "world_religions",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 38.25,
+        "B": 37.75,
+        "C": 35.25,
+        "D": 43.25
+      }
+    },
+    {
+      "subject": "high_school_psychology",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 43.25,
+        "B": 41.25,
+        "C": 45.25,
+        "D": 41.75
+      }
+    },
+    {
+      "subject": "management",
+      "correct_answer": "D",
+      "model_answer": "C",
+      "is_correct": false,
+      "logits": {
+        "A": 36.0,
+        "B": 35.0,
+        "C": 41.75,
+        "D": 34.0
+      }
+    },
+    {
+      "subject": "high_school_psychology",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 36.5,
+        "B": 34.5,
+        "C": 43.25,
+        "D": 32.25
+      }
+    },
+    {
+      "subject": "clinical_knowledge",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 43.25,
+        "B": 43.5,
+        "C": 37.25,
+        "D": 35.5
+      }
+    },
+    {
+      "subject": "marketing",
+      "correct_answer": "B",
+      "model_answer": "D",
+      "is_correct": false,
+      "logits": {
+        "A": 43.5,
+        "B": 45.25,
+        "C": 44.25,
+        "D": 45.5
+      }
+    },
+    {
+      "subject": "sociology",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 40.5,
+        "B": 42.0,
+        "C": 38.25,
+        "D": 33.0
+      }
+    },
+    {
+      "subject": "clinical_knowledge",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 44.0,
+        "B": 39.75,
+        "C": 43.25,
+        "D": 38.75
+      }
+    },
+    {
+      "subject": "philosophy",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 40.0,
+        "B": 38.5,
+        "C": 39.5,
+        "D": 44.0
+      }
+    },
+    {
+      "subject": "college_physics",
+      "correct_answer": "B",
+      "model_answer": "C",
+      "is_correct": false,
+      "logits": {
+        "A": 45.0,
+        "B": 47.25,
+        "C": 48.0,
+        "D": 45.0
+      }
+    },
+    {
+      "subject": "philosophy",
+      "correct_answer": "D",
+      "model_answer": "D",
+      "is_correct": true,
+      "logits": {
+        "A": 44.25,
+        "B": 40.75,
+        "C": 45.75,
+        "D": 47.0
+      }
+    },
+    {
+      "subject": "college_physics",
+      "correct_answer": "D",
+      "model_answer": "C",
+      "is_correct": false,
+      "logits": {
+        "A": 46.75,
+        "B": 47.25,
+        "C": 47.75,
+        "D": 47.25
+      }
+    },
+    {
+      "subject": "high_school_psychology",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 34.25,
+        "B": 40.0,
+        "C": 31.125,
+        "D": 30.375
+      }
+    },
+    {
+      "subject": "management",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 34.25,
+        "B": 33.0,
+        "C": 40.75,
+        "D": 31.75
+      }
+    },
+    {
+      "subject": "high_school_psychology",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 32.0,
+        "B": 41.0,
+        "C": 30.75,
+        "D": 30.375
+      }
+    },
+    {
+      "subject": "sociology",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 43.0,
+        "B": 39.75,
+        "C": 38.75,
+        "D": 36.5
+      }
+    },
+    {
+      "subject": "management",
+      "correct_answer": "B",
+      "model_answer": "C",
+      "is_correct": false,
+      "logits": {
+        "A": 42.0,
+        "B": 41.0,
+        "C": 43.5,
+        "D": 39.5
+      }
+    },
+    {
+      "subject": "computer_security",
+      "correct_answer": "B",
+      "model_answer": "B",
+      "is_correct": true,
+      "logits": {
+        "A": 44.0,
+        "B": 45.0,
+        "C": 41.5,
+        "D": 40.5
+      }
+    },
+    {
+      "subject": "world_religions",
+      "correct_answer": "A",
+      "model_answer": "A",
+      "is_correct": true,
+      "logits": {
+        "A": 37.5,
+        "B": 29.375,
+        "C": 29.875,
+        "D": 28.375
+      }
+    },
+    {
+      "subject": "marketing",
+      "correct_answer": "C",
+      "model_answer": "C",
+      "is_correct": true,
+      "logits": {
+        "A": 35.0,
+        "B": 34.5,
+        "C": 41.75,
+        "D": 33.75
+      }
+    }
+  ],
+  "status": "success"
+}
