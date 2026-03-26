@@ -723,6 +723,7 @@ Phi-3 Mini & 23.23 & 7.12 & 45.64 & 3.78 & 88.40 & 2.00 & 3.8$\times$ \\
     ymin=0,
     ymax=240,
     legend style={at={(0.5,1.02)}, anchor=south, legend columns=3, font=\small},
+    legend image code/.code={\draw[fill,draw=none,#1] (0cm,-0.1cm) rectangle (0.3cm,0.2cm);},
     nodes near coords,
     nodes near coords style={font=\tiny},
     every node near coord/.append style={rotate=90, anchor=west}
@@ -776,6 +777,7 @@ Phi-3 Mini & 88.40 & 2.00 & 13.04 & 6.8$\times$ \\
     ymin=0,
     ymax=250,
     legend style={at={(0.5,1.02)}, anchor=south, legend columns=2, font=\small},
+    legend image code/.code={\draw[fill,draw=none,#1] (0cm,-0.1cm) rectangle (0.3cm,0.2cm);},
     nodes near coords,
     nodes near coords style={font=\tiny}
 ]
@@ -863,7 +865,8 @@ INT4 quantization reduces energy consumption by 2.2$\times$ to 3.9$\times$ compa
     x tick label style={rotate=30, anchor=east, font=\small},
     ymin=0,
     ymax=70,
-    legend style={at={(0.5,1.02)}, anchor=south, legend columns=3, font=\small}
+    legend style={at={(0.5,1.02)}, anchor=south, legend columns=3, font=\small},
+    legend image code/.code={\draw[fill,draw=none,#1] (0cm,-0.1cm) rectangle (0.3cm,0.2cm);}
 ]
 \addplot coordinates {(Q-0.8B,13) (Q-2B,26) (Q-4B,56) (Phi-3,58)};
 \addplot coordinates {(Q-0.8B,8) (Q-2B,15) (Q-4B,32) (Phi-3,30)};
@@ -913,7 +916,8 @@ Figure~\ref{fig:energy_distribution} illustrates the energy distribution across 
     xtick=data,
     x tick label style={rotate=30, anchor=east, font=\small},
     ymin=0,
-    legend style={at={(0.5,1.02)}, anchor=south, legend columns=3, font=\small}
+    legend style={at={(0.5,1.02)}, anchor=south, legend columns=3, font=\small},
+    legend image code/.code={\draw[fill,draw=none,#1] (0cm,-0.1cm) rectangle (0.3cm,0.2cm);}
 ]
 \addplot coordinates {(Q-0.8B,13) (Q-2B,26) (Q-4B,56) (Phi-3,58)};
 \addplot coordinates {(Q-0.8B,8) (Q-2B,15) (Q-4B,32) (Phi-3,30)};
@@ -961,6 +965,7 @@ Phi-3 Mini & 78.0 & 78.0 & 77.0 & --1.0 \\
     ymin=0,
     ymax=100,
     legend style={at={(0.5,1.02)}, anchor=south, legend columns=3, font=\small},
+    legend image code/.code={\draw[fill,draw=none,#1] (0cm,-0.1cm) rectangle (0.3cm,0.2cm);},
     nodes near coords,
     nodes near coords style={font=\tiny},
     every node near coord/.append style={rotate=90, anchor=west}
