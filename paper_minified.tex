@@ -149,7 +149,7 @@ An Evaluation of Post-Training Quantization on Apple Silicon}
 % ABSTRACT
 % =============================================================================
 \begin{abstract}
-\noindent Running large language models on edge devices means squeezing them into tight memory budgets, without losing too much accuracy in the process. In this paper, we evaluate post-training quantization (PTQ) for small language models on Apple Silicon. We compare Apple's MLX framework (FP16, INT8, INT4) against Ollama (Q4\_K\_M block quantization) using the Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B) on an M4 Pro with 24\,GB unified memory. Within MLX, INT4 gives us $2.0\times$--$3.8\times$ better throughput over FP16 and cuts memory by $3.5\times$--$3.6\times$. When we compare the two ecosystems end-to-end, MLX INT4 is $6.8\times$--$13.4\times$ faster than Ollama Q4\_K\_M, though it is worth noting that these use very different quantization schemes under the hood. On the accuracy side, our logit-based MMLU evaluation (100 questions, 10 subjects) indicates that INT4 preserves most of FP16's accuracy for models above 3.8B parameters, with drops of just 1 percentage point for Qwen3.5-4B and Phi-3 Mini. Every model we tested fits within 2.5\,GB after quantization, which opens the door to edge deployment even on devices with only 8\,GB of RAM.
+\noindent Running large language models on edge devices means squeezing them into tight memory budgets, without losing too much accuracy in the process. In this paper, we evaluate post-training quantization (PTQ) for small language models on Apple Silicon using Apple's MLX framework at three precision levels (FP16, INT8, INT4). We benchmark the Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B) on an M4 Pro with 24\,GB unified memory. INT4 gives us $2.0\times$--$3.8\times$ better throughput over FP16 and cuts memory by $3.5\times$--$3.6\times$. On the accuracy side, our logit-based MMLU evaluation (100 questions, 10 subjects) indicates that INT4 preserves most of FP16's accuracy for models above 3.8B parameters, with drops of just 1 percentage point for Qwen3.5-4B and Phi-3 Mini. Every model we tested fits within 2.5\,GB after INT4 quantization, which opens the door to edge deployment even on devices with only 8\,GB of RAM.
 \end{abstract}
 
 % =============================================================================
@@ -173,7 +173,6 @@ That said, several practical questions remain unanswered:
 
 \begin{itemize}[leftmargin=*,nosep]
     \item How do different quantization bit-widths affect throughput, memory, and accuracy on Apple Silicon?
-    \item What is the practical difference between inference ecosystems (MLX vs.\ Ollama) for edge deployment?
     \item How does model size influence quantization sensitivity?
 \end{itemize}
 
@@ -183,8 +182,6 @@ We set out to answer these questions through hands-on experiments on an Apple M4
 
 \begin{enumerate}[leftmargin=*,nosep]
     \item \textbf{Quantization analysis}: We benchmark MLX at three precision levels (FP16, INT8, INT4) across the Qwen3.5 series and Phi-3 Mini, measuring how each level affects throughput, memory usage, and accuracy.
-
-    \item \textbf{Ecosystem comparison}: We pit MLX (INT4) against Ollama (Q4\_K\_M), two fundamentally different inference stacks, and tease apart what drives the performance gap between them.
 
     \item \textbf{Accuracy evaluation}: We use logit-based MMLU scoring (100 questions, 10 subjects) to check how much accuracy we actually lose to quantization. The short answer: not much, if your model is above 3.8B parameters.
 
@@ -234,7 +231,7 @@ We set out to answer these questions through hands-on experiments on an Apple M4
 % === Layer 4: Evaluation (Teal/Green) ===
 \node[box, fill=teal!20, draw=teal!70, below=1.2cm of m4, minimum width=2.8cm] (memory) {Memory: 3.5$\times$--3.6$\times$\\Reduction};
 \node[box, fill=teal!20, draw=teal!70, right=of memory, minimum width=2.8cm] (speed) {Speed: 2.0$\times$--3.8$\times$\\Faster (INT4 vs FP16)};
-\node[box, fill=teal!20, draw=teal!70, left=of memory, minimum width=2.8cm] (energy2) {Throughput: 6.8$\times$--13.4$\times$\\(MLX vs Ollama)};
+\node[box, fill=teal!20, draw=teal!70, left=of memory, minimum width=2.8cm] (energy2) {Accuracy: Minimal loss\\($\geq$3.8B params)};
 
 % === Arrows: Context → Solution ===
 \draw[arrow, blue!60] (energy.south) -- ++(0,-0.3) -| (edge2.north);
@@ -362,7 +359,7 @@ The simplest 4-bit approach: just quantize all weights to INT4 uniformly, with n
 
 \subsubsection{Block Quantization (Q4\_K\_M)}
 
-Ollama uses the GGUF format from llama.cpp \cite{llamacpp2023}, which takes a more nuanced approach to 4-bit quantization. Q4\_K\_M splits weight matrices into blocks (typically 32 or 256 elements) and stores per-block scale factors and minimums. Some blocks get 4-bit precision, others get 6-bit, depending on their importance. The goal is to preserve more accuracy than naive INT4, but the trade-off is extra dequantization overhead at inference time, since each block has to be rescaled independently.
+The GGUF format from llama.cpp \cite{llamacpp2023} takes a more nuanced approach to 4-bit quantization. Schemes like Q4\_K\_M split weight matrices into blocks (typically 32 or 256 elements) and store per-block scale factors and minimums. Some blocks get 4-bit precision, others get 6-bit, depending on their importance. The goal is to preserve more accuracy than naive INT4, but the trade-off is extra dequantization overhead at inference time, since each block has to be rescaled independently.
 
 \subsection{Quantization for Edge Deployment}
 
@@ -372,7 +369,7 @@ A growing body of work has looked at deploying quantized LLMs on edge hardware:
 
 \textbf{MLC-LLM} \cite{mlcllm2023} provides a compilation-based approach for deploying quantized LLMs across diverse hardware platforms, including mobile devices and Apple Silicon.
 
-\textbf{Huang et al.} \cite{huang2025llms} evaluated LLM inference on edge devices using Ollama, measuring energy efficiency across 28 quantized models on Raspberry Pi 4.
+\textbf{Huang et al.} \cite{huang2025llms} evaluated LLM inference on edge devices, measuring energy efficiency across 28 quantized models on Raspberry Pi 4.
 
 \textbf{Benazir and Lin} \cite{benazir2025profiling} profiled LLM inference on Apple Silicon from a quantization perspective, identifying optimal configurations for M-series chips.
 
@@ -380,7 +377,7 @@ A growing body of work has looked at deploying quantized LLMs on edge hardware:
 
 \textbf{Jin et al.} \cite{jin2024comprehensive} provided a comprehensive evaluation of quantization strategies for LLMs, comparing weight-only, weight-activation, and mixed-precision approaches.
 
-Where our work fits in: we compare two very different inference ecosystems, MLX and Ollama, head-to-head on the same Apple Silicon hardware, using some of the newest small models (Qwen3.5 series and Phi-3 Mini), and we include energy estimation alongside the usual throughput and accuracy metrics.
+Where our work fits in: we systematically evaluate MLX quantization (FP16, INT8, INT4) on Apple Silicon using some of the newest small models (Qwen3.5 series and Phi-3 Mini), and we include energy estimation and logit-based accuracy evaluation alongside the usual throughput and memory metrics.
 
 \subsection{Small Language Models}
 
@@ -453,8 +450,8 @@ This creates a real problem for our setup. On Apple Silicon, RAPL is not availab
 Our setup is fairly straightforward, as illustrated in Figure~\ref{fig:system_architecture}:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Ecosystem comparison}: We benchmark both MLX and Ollama frameworks for inference across all models.
     \item \textbf{Model selection}: We evaluate the Qwen3.5 series (0.8B, 2B, 4B) and Phi-3 Mini, representing diverse parameter counts and architectures.
+    \item \textbf{Quantization sweep}: We benchmark MLX at three precision levels (FP16, INT8, INT4) for each model.
     \item \textbf{Comprehensive metrics}: We measure throughput, memory footprint, accuracy, and estimated energy consumption.
 \end{enumerate}
 
@@ -481,20 +478,17 @@ Our setup is fairly straightforward, as illustrated in Figure~\ref{fig:system_ar
 \node[box, fill=blue!15, draw=blue!60, below=of hardware] (memory) {Unified Memory (24GB)};
 
 % === Framework Layer ===
-\node[box, fill=green!15, draw=green!60, below left=0.8cm and 0.5cm of memory] (mlx) {MLX Framework\\(FP16, INT8, INT4)};
-\node[box, fill=green!15, draw=green!60, below right=0.8cm and 0.5cm of memory] (ollama) {Ollama\\(Q4\_K\_M)};
+\node[box, fill=green!15, draw=green!60, below=0.8cm of memory] (mlx) {MLX Framework\\(FP16, INT8, INT4)};
 
 % === Model Layer ===
-\node[box, fill=orange!20, draw=orange!70, below=1.2cm of memory] (models) {Qwen3.5 (0.8B, 2B, 4B)\\Phi-3 Mini (3.82B)};
+\node[box, fill=orange!20, draw=orange!70, below=0.8cm of mlx] (models) {Qwen3.5 (0.8B, 2B, 4B)\\Phi-3 Mini (3.82B)};
 
 % === Arrows ===
 \draw[arrow] (hardware) -- (memory);
-\draw[arrow] (memory.south) -- ++(0,-0.3) -| (mlx.north);
-\draw[arrow] (memory.south) -- ++(0,-0.3) -| (ollama.north);
-\draw[arrow] (mlx.south) -- ++(0,-0.3) -| (models.north west);
-\draw[arrow] (ollama.south) -- ++(0,-0.3) -| (models.north east);
+\draw[arrow] (memory) -- (mlx);
+\draw[arrow] (mlx) -- (models);
 \end{tikzpicture}
-\caption{System architecture for PTQ evaluation. Both frameworks are evaluated across all four models.}
+\caption{System architecture for PTQ evaluation on Apple Silicon using MLX.}
 \label{fig:system_architecture}
 \end{figure}
 
@@ -551,11 +545,11 @@ The Qwen3.5 series \cite{qwen2025technical} from Alibaba are efficient language 
     \item \textbf{Qwen3.5-4B}: 4.66B parameters, higher accuracy with greater resource requirements
 \end{itemize}
 
-Key features include GQA attention, RoPE embeddings, SwiGLU activation, and dual-mode reasoning (thinking/non-thinking). All Qwen3.5 experiments were conducted using both Ollama and MLX.
+Key features include GQA attention, RoPE embeddings, SwiGLU activation, and dual-mode reasoning (thinking/non-thinking). All Qwen3.5 experiments were conducted using MLX.
 
 \subsubsection{Phi-3 Mini}
 
-Phi-3 Mini \cite{abdin2024phi3} is a 3.82-billion-parameter dense transformer from Microsoft: 3072 hidden dimensions, 32 attention heads, 32 layers, 128K context length. Experiments were conducted using both Ollama and MLX.
+Phi-3 Mini \cite{abdin2024phi3} is a 3.82-billion-parameter dense transformer from Microsoft: 3072 hidden dimensions, 32 attention heads, 32 layers, 128K context length. Experiments were conducted using MLX.
 
 \subsection{Hardware Platform}
 
@@ -617,8 +611,8 @@ The unified memory design means the CPU and GPU share the same physical memory p
 \subsubsection{Software}
 
 \begin{itemize}[leftmargin=*,nosep]
-    \item \textbf{Frameworks}: MLX 0.31.0 (Apple-native), Ollama (llama.cpp backend with GGUF)
-    \item \textbf{Quantization}: MLX built-in quantization (FP16, INT8, INT4); Ollama Q4\_K\_M
+    \item \textbf{Framework}: MLX 0.31.0 (Apple-native)
+    \item \textbf{Quantization}: MLX built-in quantization (FP16, INT8, INT4)
     \item \textbf{Energy estimation}: CodeCarbon 3.2.3
     \item \textbf{Accuracy evaluation}: Custom logit-based MMLU scorer using Hugging Face Transformers
 \end{itemize}
@@ -639,7 +633,7 @@ The unified memory design means the CPU and GPU share the same physical memory p
 % =============================================================================
 \section{Experiments and Results}
 
-Here are the results from running all four models through MLX (FP16, INT8, INT4) and Ollama (Q4\_K\_M) on our M4 Pro. Every number is the average of 10 runs after a warmup pass. All raw data and benchmark scripts are in the project repository for anyone who wants to reproduce or dig deeper.
+Here are the results from running all four models through MLX at three precision levels (FP16, INT8, INT4) on our M4 Pro. Every number is the average of 10 runs after a warmup pass. All raw data and benchmark scripts are in the project repository for anyone who wants to reproduce or dig deeper.
 
 \subsection{Memory Footprint}
 
@@ -647,22 +641,21 @@ Table~\ref{tab:memory} shows memory requirements across all configurations.
 
 \begin{table}[htbp]
 \centering
-\caption{Memory footprint (GB) across frameworks and quantization levels.}
+\caption{Memory footprint (GB) across MLX quantization levels.}
 \label{tab:memory}
-\begin{tabular}{l|cccc}
+\begin{tabular}{l|ccc}
 \toprule
-\textbf{Model} & \textbf{FP16} & \textbf{INT8} & \textbf{INT4} & \textbf{Ollama} \\
- & (MLX) & (MLX) & (MLX) & (Q4\_K\_M) \\
+\textbf{Model} & \textbf{FP16} & \textbf{INT8} & \textbf{INT4} \\
 \midrule
-Qwen3.5-0.8B & 1.40 & 0.74 & 0.39 & 0.52 \\
-Qwen3.5-2B & 3.51 & 1.86 & 0.99 & 1.32 \\
-Qwen3.5-4B & 7.83 & 4.16 & 2.20 & 2.65 \\
-Phi-3 Mini & 7.12 & 3.78 & 2.00 & 2.28 \\
+Qwen3.5-0.8B & 1.40 & 0.74 & 0.39 \\
+Qwen3.5-2B & 3.51 & 1.86 & 0.99 \\
+Qwen3.5-4B & 7.83 & 4.16 & 2.20 \\
+Phi-3 Mini & 7.12 & 3.78 & 2.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-MLX INT4 is the clear winner on memory: $3.5\times$--$3.6\times$ smaller than FP16 across the board. Ollama's Q4\_K\_M comes out 20--30\% larger than MLX INT4 because the extra space goes to per-block scale factors and minimum values that the block quantization format needs.
+INT4 delivers $3.5\times$--$3.6\times$ memory reduction over FP16 across the board. Every model fits within 2.5\,GB at INT4, making edge deployment feasible even on devices with only 8\,GB of RAM.
 
 \subsection{Quantization Method Comparison}
 
@@ -672,19 +665,18 @@ Table~\ref{tab:quant_comparison} compares quantization configurations for Qwen3.
 \centering
 \caption{Quantization comparison for Qwen3.5-0.8B on M4 Pro (100 tokens generated).}
 \label{tab:quant_comparison}
-\begin{tabular}{l|ccccc}
+\begin{tabular}{l|cccc}
 \toprule
-\textbf{Method} & \textbf{Framework} & \textbf{Size (GB)} & \textbf{tok/s} & \textbf{ms/tok} & \textbf{Speedup} \\
+\textbf{Method} & \textbf{Size (GB)} & \textbf{tok/s} & \textbf{ms/tok} & \textbf{Speedup} \\
 \midrule
-FP16 & MLX & 1.40 & 104.69 & 9.55 & 1.0$\times$ \\
-INT8 & MLX & 0.74 & 166.08 & 6.02 & 1.6$\times$ \\
-INT4 & MLX & 0.39 & 213.11 & 4.69 & 2.0$\times$ \\
-Q4\_K\_M & Ollama & 0.52 & 27.24 & 36.71 & 0.3$\times$ \\
+FP16 & 1.40 & 104.69 & 9.55 & 1.0$\times$ \\
+INT8 & 0.74 & 166.08 & 6.02 & 1.6$\times$ \\
+INT4 & 0.39 & 213.11 & 4.69 & 2.0$\times$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Within MLX, the pattern is clean: lower bit-width means higher throughput. INT4 runs $2.0\times$ faster than FP16 for this model. Now, the Ollama number deserves a caveat: you cannot directly compare MLX INT4 and Ollama Q4\_K\_M as an apples-to-apples test. They use different quantization schemes (uniform INT4 vs.\ block quantization with mixed precision) and different runtimes (Metal-native MLX vs.\ the llama.cpp backend). The $7.8\times$ gap is real, but it reflects all of these differences combined, not just framework overhead.
+The pattern is clean: lower bit-width means higher throughput. INT4 runs $2.0\times$ faster than FP16 for this model, with INT8 sitting in between at $1.6\times$. Each step down in precision roughly halves memory while boosting throughput, a trade-off that is well worth it if accuracy holds up (which we examine in Section~\ref{sec:accuracy}).
 
 \subsection{Throughput Analysis}
 
@@ -741,90 +733,6 @@ Phi-3 Mini & 23.23 & 7.12 & 45.64 & 3.78 & 88.40 & 2.00 & 3.8$\times$ \\
 
 Two things jump out from Table~\ref{tab:latency} and Figure~\ref{fig:tokens_per_sec}. First, the bigger the model, the more you gain from INT4: the speedup goes from $2.0\times$ for the 0.8B model all the way up to $3.8\times$ for Phi-3 Mini. This makes sense because larger models are more memory-bandwidth-bound at FP16, so cutting bandwidth by $4\times$ helps them more. Second, there is an interesting reversal: Phi-3 Mini (3.82B) actually runs faster at INT4 (88.40 tok/s) than the larger Qwen3.5-4B (71.21 tok/s, 4.66B). Phi-3's simpler dense architecture seems to be more compute-efficient per parameter.
 
-\subsection{Ecosystem Comparison: MLX vs.\ Ollama}
-
-Table~\ref{tab:mlx_memory} puts MLX INT4 and Ollama Q4\_K\_M side by side. We want to be clear upfront: this is not a controlled experiment where we hold everything constant except the framework. These two ecosystems differ in quantization scheme, runtime design, and how they use the hardware. What we \textit{are} measuring is the practical difference a developer would see when choosing one tool over the other.
-
-\begin{table}[htbp]
-\centering
-\caption{Ecosystem comparison: MLX INT4 vs.\ Ollama Q4\_K\_M. Differences reflect the combined effect of quantization scheme, runtime, and hardware utilization.}
-\label{tab:mlx_memory}
-\begin{tabular}{l|cccc}
-\toprule
-\textbf{Model} & \textbf{MLX INT4} & \textbf{MLX Mem} & \textbf{Ollama Q4\_K\_M} & \textbf{Throughput} \\
-& tok/s & GB & tok/s & Ratio \\
-\midrule
-Qwen3.5-0.8B & 213.11 & 0.39 & 27.24 & 7.8$\times$ \\
-Qwen3.5-2B & 131.86 & 0.99 & 18.07 & 7.3$\times$ \\
-Qwen3.5-4B & 71.21 & 2.20 & 5.30 & 13.4$\times$ \\
-Phi-3 Mini & 88.40 & 2.00 & 13.04 & 6.8$\times$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure}[htbp]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-    ybar,
-    bar width=12pt,
-    width=\columnwidth,
-    height=6cm,
-    ylabel={Tokens per second},
-    xlabel={Model},
-    symbolic x coords={Q-0.8B, Q-2B, Q-4B, Phi-3},
-    xtick=data,
-    x tick label style={rotate=30, anchor=east, font=\small},
-    ymin=0,
-    ymax=250,
-    legend style={at={(0.5,1.02)}, anchor=south, legend columns=2, font=\small},
-    legend image code/.code={\draw[fill,draw=none,#1] (0cm,-0.1cm) rectangle (0.3cm,0.2cm);},
-    nodes near coords,
-    nodes near coords style={font=\tiny}
-]
-\addplot coordinates {(Q-0.8B,213.11) (Q-2B,131.86) (Q-4B,71.21) (Phi-3,88.40)};
-\addplot coordinates {(Q-0.8B,27.24) (Q-2B,18.07) (Q-4B,5.30) (Phi-3,13.04)};
-\legend{MLX INT4, Ollama Q4\_K\_M}
-\end{axis}
-\end{tikzpicture}
-\caption{Ecosystem comparison: MLX INT4 vs.\ Ollama Q4\_K\_M throughput. The throughput gap ($6.8\times$--$13.4\times$) reflects differences in quantization scheme, runtime overhead, and hardware utilization, not framework overhead alone.}
-\label{fig:mlx_vs_ollama}
-\end{figure}
-
-The numbers are striking: MLX is $6.8\times$--$13.4\times$ faster than Ollama across every model we tested (Figure~\ref{fig:mlx_vs_ollama}). Why such a big gap? We think several factors stack up:
-
-\begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Hardware utilization}: MLX uses Metal Performance Shaders for native GPU execution on Apple Silicon, while Ollama's llama.cpp backend primarily targets CPU inference with optional Metal acceleration.
-
-    \item \textbf{Quantization overhead}: Q4\_K\_M's block quantization requires per-block dequantization during inference (rescaling each 32--256 element block independently), whereas MLX's INT4 uses simpler uniform dequantization with lower computational overhead.
-
-    \item \textbf{Memory access patterns}: MLX is designed for Apple Silicon's unified memory architecture, potentially achieving better memory access locality than the more hardware-agnostic llama.cpp runtime.
-\end{enumerate}
-
-It is also notable that the gap is widest for the largest model ($13.4\times$ for Qwen3.5-4B vs.\ $6.8\times$ for Phi-3 Mini), which fits the memory-bandwidth explanation: the bigger the model, the more MLX's optimized memory access pays off.
-
-\subsection{Ollama Inference Results}
-
-For completeness, Table~\ref{tab:ollama_results} shows the raw Ollama numbers.
-
-\begin{table}[htbp]
-\centering
-\caption{Ollama Q4\_K\_M inference results (100 tokens generated).}
-\label{tab:ollama_results}
-\begin{tabular}{l|cccc}
-\toprule
-\textbf{Model} & \textbf{ms/token} & \textbf{tok/s} & \textbf{Est.\ Energy (kWh)} & \textbf{Parameters} \\
-\midrule
-Qwen3.5-0.8B & 36.71 & 27.24 & 0.000053 & 873M \\
-Qwen3.5-2B & 55.33 & 18.07 & 0.000141 & 2.27B \\
-Qwen3.5-4B & 188.78 & 5.30 & 0.000361 & 4.66B \\
-Phi-3 Mini & 76.68 & 13.04 & 0.000100 & 3.82B \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Qwen3.5-0.8B is the fastest at 27.24 tok/s, which is usable but not exactly snappy. Qwen3.5-4B struggles at 5.30 tok/s, which would be painfully slow for interactive use. We suspect the 4.66B-parameter model is pushing past the sweet spot for llama.cpp's memory management on this hardware.
-
 \subsection{Energy Estimation}
 
 We want to reiterate the caveat from Section~\ref{sec:energy_method}: on Apple Silicon, CodeCarbon's energy numbers are derived from TDP-based power models, so they track inference time more than actual power draw. We include them because they are the best we can do without hardware instrumentation, but keep this in mind as you read the tables.
@@ -877,29 +785,8 @@ Phi-3 Mini & 23.23 & 0.000058 & 45.64 & 0.000030 & 88.40 & 0.000015 & 3.9$\times
 \label{fig:energy_quantization}
 \end{figure}
 
-Table~\ref{tab:framework_energy} compares estimated energy between the two ecosystems.
-
-\begin{table}[htbp]
-\centering
-\caption{Ecosystem energy comparison: MLX INT4 vs.\ Ollama Q4\_K\_M (100 tokens). Energy values are CodeCarbon estimates.}
-\label{tab:framework_energy}
-\begin{tabular}{l|ccccc}
-\toprule
-\textbf{Model} & \multicolumn{2}{c}{\textbf{MLX INT4}} & \multicolumn{2}{c}{\textbf{Ollama Q4\_K\_M}} & \textbf{Est.\ Energy} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5}
-& tok/s & kWh & tok/s & kWh & Ratio \\
-\midrule
-Qwen3.5-0.8B & 213.11 & 0.000006 & 27.24 & 0.000053 & 8.8$\times$ \\
-Qwen3.5-2B & 131.86 & 0.000010 & 18.07 & 0.000141 & 14.1$\times$ \\
-Qwen3.5-4B & 71.21 & 0.000019 & 5.30 & 0.000361 & 19.0$\times$ \\
-Phi-3 Mini & 88.40 & 0.000015 & 13.04 & 0.000100 & 6.7$\times$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Unsurprisingly, the energy ratios ($6.7\times$--$19.0\times$) closely mirror the throughput ratios, which is exactly what you would expect when the power estimate is roughly constant. That said, the underlying intuition probably holds: faster inference should mean less energy per token, since the chip is not doing radically different work at INT4 versus FP16. But confirming this properly would take a hardware power meter.
-
 \subsection{Accuracy Retention Under Quantization}
+\label{sec:accuracy}
 
 Table~\ref{tab:mmlu_accuracy} presents MMLU accuracy across all models and quantization levels, measured using logit-based scoring on 100 questions spanning 10 subjects.
 
@@ -970,8 +857,6 @@ With the caveat that 100 questions is a limited sample, here is what the data su
     \item \textbf{Single device}: All results are from a single M4 Pro unit; chip-to-chip variation and thermal throttling under sustained load are not characterized.
 
     \item \textbf{Short generation length}: Benchmarks use 100-token generation; throughput and energy characteristics may differ for longer sequences, streaming workloads, or batched inference.
-
-    \item \textbf{Ecosystem comparison caveats}: The MLX-vs-Ollama comparison conflates framework overhead, quantization scheme, and hardware utilization differences. Isolating each factor would require running the same quantization scheme on both runtimes, which is not currently possible.
 \end{enumerate}
 
 \subsection{Recommendations for Practitioners}
@@ -979,8 +864,6 @@ With the caveat that 100 questions is a limited sample, here is what the data su
 Based on our experimental findings:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Framework choice on Apple Silicon}: MLX delivers substantially higher throughput than Ollama for all tested models. For Apple Silicon deployment, MLX should be the default choice.
-
     \item \textbf{Quantization level}: INT4 provides the best throughput--memory trade-off for models above 3.8B parameters, where accuracy impact appears minimal. For smaller models, INT8 may be preferable to avoid larger accuracy degradation.
 
     \item \textbf{Model selection}: Practitioners should select models based on their accuracy requirements. Qwen3.5-4B and Phi-3 Mini offer the best accuracy--efficiency balance at INT4 on this hardware.
@@ -996,22 +879,6 @@ Based on our experimental findings:
 One of the clearer takeaways from our experiments is that Apple Silicon's unified memory architecture is not just a marketing feature. It genuinely changes the quantization story. When CPU and GPU share the same memory pool, reducing weight precision translates directly into less memory bandwidth consumed. And since memory bandwidth is the bottleneck for autoregressive generation (you are reading one token's worth of weights per step), this matters a lot.
 
 This is why we see the INT4 speedup ratio increase with model size (Table~\ref{tab:latency}): bigger models are more bandwidth-starved at FP16, so they benefit more from the $4\times$ bandwidth reduction that INT4 gives you. Benazir and Lin \cite{benazir2025profiling} saw the same pattern independently and found that Apple Silicon amplifies quantization benefits compared to discrete-GPU systems, where PCIe transfer overhead eats into some of the bandwidth savings.
-
-\subsection{Making Sense of the MLX--Ollama Gap}
-
-A $6.8\times$--$13.4\times$ throughput gap is hard to ignore, but we want to be careful about what conclusions to draw. It would be tempting to say ``MLX is just a better framework,'' but the reality is messier. At least three things are different between the two setups:
-
-\begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Quantization scheme}: MLX uses uniform per-group INT4; Ollama uses Q4\_K\_M block quantization with mixed 4/6-bit precision. The latter requires more complex dequantization at inference time.
-
-    \item \textbf{Runtime design}: MLX is purpose-built for Apple Silicon using Metal compute shaders. Ollama's llama.cpp backend is designed for cross-platform portability, which may limit platform-specific optimization.
-
-    \item \textbf{Hardware utilization}: MLX likely achieves higher GPU utilization on the M4 Pro's 16-core GPU, while Ollama may rely more heavily on CPU paths.
-\end{enumerate}
-
-We are not the first to see this kind of gap. Huang et al.\ \cite{huang2025llms} found similarly large differences between inference frameworks on Raspberry Pi, which suggests that framework choice is an underappreciated factor in edge deployment, possibly more important than the choice of quantization method.
-
-The practical takeaway is simple: if you are on Apple Silicon, use MLX. The throughput advantage is large enough that the ``why'' is almost academic from a deployment perspective.
 
 \subsection{The Accuracy Question}
 
@@ -1066,21 +933,19 @@ We only tested four models from two families, so there are gaps:
 % =============================================================================
 \section{Conclusion}
 
-We set out to figure out how well post-training quantization works for deploying small language models on Apple Silicon. We ran the Qwen3.5 series (0.8B, 2B, 4B) and Phi-3 Mini through MLX and Ollama on an M4 Pro with 24\,GB of unified memory.
+We set out to figure out how well post-training quantization works for deploying small language models on Apple Silicon. We ran the Qwen3.5 series (0.8B, 2B, 4B) and Phi-3 Mini through MLX at three precision levels (FP16, INT8, INT4) on an M4 Pro with 24\,GB of unified memory.
 
 Here is what we found:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Quantization within MLX}: INT4 provides $2.0\times$--$3.8\times$ throughput improvement over FP16, with $3.5\times$--$3.6\times$ memory reduction. The speedup ratio increases with model size, consistent with larger models being more memory-bandwidth-bound.
+    \item \textbf{Throughput}: INT4 provides $2.0\times$--$3.8\times$ throughput improvement over FP16. The speedup ratio increases with model size, consistent with larger models being more memory-bandwidth-bound.
 
-    \item \textbf{Ecosystem comparison}: MLX INT4 delivers $6.8\times$--$13.4\times$ higher throughput than Ollama Q4\_K\_M. This gap reflects differences in quantization scheme, runtime optimization, and hardware utilization, and should not be attributed to any single factor.
-
-    \item \textbf{Memory efficiency}: All models fit within 2.5\,GB under MLX INT4, enabling deployment on devices with 8\,GB RAM.
+    \item \textbf{Memory efficiency}: INT4 delivers $3.5\times$--$3.6\times$ memory reduction, with all models fitting within 2.5\,GB, enabling deployment on devices with 8\,GB RAM.
 
     \item \textbf{Accuracy trends}: MMLU evaluation on 100 questions suggests that models above 3.8B parameters tolerate INT4 with minimal observed accuracy loss, though the small sample size limits statistical confidence.
 \end{enumerate}
 
-If there is one takeaway from this work, it is this: on Apple Silicon, \textit{which tool you use} matters more than \textit{how aggressively you quantize}. MLX with INT4 is currently the best option for models in the 1--5B parameter range, giving you the best combination of speed, memory efficiency, and accuracy retention. The gap between MLX and Ollama is so large that framework choice should be the first decision, not an afterthought.
+If there is one takeaway from this work, it is this: on Apple Silicon, INT4 quantization via MLX is currently the best option for models in the 1--5B parameter range, giving you the best combination of speed, memory efficiency, and accuracy retention. The key insight is that larger models benefit more from aggressive quantization, both in throughput gains and in accuracy resilience, which means INT4 is the right default for models above 3.8B parameters.
 
 \begin{sloppypar}
 \noindent\textbf{Code and Data:} Available at \url{https://github.com/harshpreet931/researchPaper-quantization}
