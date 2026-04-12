@@ -183,7 +183,7 @@ We set out to answer these questions through hands-on experiments on an Apple M4
 \begin{enumerate}[leftmargin=*,nosep]
     \item \textbf{Quantization analysis}: We benchmark MLX at three precision levels (FP16, INT8, INT4) across the Qwen3.5 series and Phi-3 Mini, measuring how each level affects throughput, memory usage, and accuracy.
 
-    \item \textbf{Accuracy evaluation}: We use logit-based MMLU scoring (100 questions, 10 subjects) to check how much accuracy we actually lose to quantization. The short answer: not much, if your model is above 3.8B parameters.
+    \item \textbf{Accuracy evaluation}: We use logit-based full-MMLU scoring on all 57 subjects (14,042 questions), which reduces the 95\% confidence interval around overall accuracy to about $\pm 0.8$ pp and lets us measure quantization effects with much higher confidence.
 
     \item \textbf{Energy estimation}: We report CodeCarbon-based energy estimates for every configuration, while being upfront about the limitations of software-based power estimation on Apple Silicon.
 \end{enumerate}
@@ -525,11 +525,11 @@ Our setup is fairly straightforward, as illustrated in Figure~\ref{fig:system_ar
 \node[below=0.1cm of select, font=\scriptsize, text=gray] {Qwen3.5, Phi-3};
 \node[below=0.1cm of measure, font=\scriptsize, text=gray] {Memory, tok/s, kWh};
 \end{tikzpicture}
-\caption{Experimental workflow for PTQ benchmarking on Apple Silicon.}
+\caption{Experimental workflow for generation benchmarking on Apple Silicon. Accuracy is measured separately with a full logit-based MMLU pass.}
 \label{fig:experimental_workflow}
 \end{figure}
 
-Figure~\ref{fig:experimental_workflow} lays out the pipeline: pick a model, quantize it, benchmark it, and collect the numbers. Straightforward, but the details matter.
+Figure~\ref{fig:experimental_workflow} lays out the throughput, memory, and energy pipeline: pick a model, quantize it, benchmark generation, and collect the system metrics. Accuracy is evaluated separately using the full MMLU sweep described below.
 
 \subsection{Models}
 
@@ -557,7 +557,7 @@ Everything runs on Apple Silicon. The M4 Pro's killer feature for LLM inference 
 
 \subsection{Evaluation Metrics}
 
-We measure four things for each model--quantization pair. All throughput and energy numbers are the mean of 10 runs after one warmup run. Standard deviations stayed below 3\% for throughput across all configurations, which tells us the M4 Pro was thermally stable during our tests. We omit error bars for readability but note this variability bound.
+We measure four things for each model--quantization pair. Throughput and energy numbers are the mean of 10 runs after one warmup run. Accuracy is computed deterministically from a single full-MMLU sweep over the same 14,042 questions for every configuration. Standard deviations stayed below 3\% for throughput across all configurations, which tells us the M4 Pro was thermally stable during our tests. We omit error bars for readability but note this variability bound.
 
 \subsubsection{Throughput}
 
@@ -575,9 +575,9 @@ We measure peak memory consumption during inference, which includes model weight
 
 \subsubsection{Task Accuracy}
 
-For accuracy, we use MMLU \cite{hendrycks2021mmlu}, a well-known benchmark covering 57 subjects. We sampled 100 questions across 10 subjects (STEM, humanities, social sciences, and a few others). One important design choice: instead of generating text and trying to parse the answer (which is a nightmare with models that have thinking modes), we use \textbf{logit-based scoring}. For each multiple-choice question, we just look at the model's next-token log-probabilities for A, B, C, and D, and pick the highest. It is deterministic, you never get an unparseable response, and it matches how lm-evaluation-harness \cite{eval-harness} does things.
+For accuracy, we use the full MMLU test split \cite{hendrycks2021mmlu}: all 57 subjects and 14,042 questions, grouped into STEM, Humanities, Social Sciences, and Other. One important design choice: instead of generating text and trying to parse the answer (which is a nightmare with models that have thinking modes), we use \textbf{logit-based scoring}. For each multiple-choice question, we just look at the model's next-token log-probabilities for A, B, C, and D, and pick the highest. It is deterministic, you never get an unparseable response, and it matches the multiple-choice evaluation style used in lm-evaluation-harness \cite{eval-harness}.
 
-\textbf{A word of caution}: 100 questions is a small sample. Statistically, the 95\% confidence interval for accuracy at this sample size is about $\pm$10 percentage points. That means when we see a 1~pp difference between FP16 and INT4, it is \textit{well within the noise}. We report these numbers as suggestive trends, not definitive conclusions. If accuracy matters for your use case, test with a bigger evaluation set.
+At this sample size, the binomial 95\% confidence interval around overall accuracy is roughly $\pm 0.8$ percentage points, which is tight enough to distinguish the multi-point INT4 drops we observe from ordinary sampling noise.
 
 \subsubsection{Energy Estimation}
 \label{sec:energy_method}
@@ -624,8 +624,9 @@ The unified memory design means the CPU and GPU share the same physical memory p
     \item Input context: 256 tokens
     \item Temperature: 0.0 (greedy decoding)
     \item Warmup: 1 run (discarded) before 10 measured runs
+    \item Accuracy benchmark: full MMLU test split (57 subjects, 14,042 questions) scored by next-token logits over A/B/C/D
     \item Random seed: 42 for reproducibility
-    \item Thinking mode: disabled for Qwen3.5 models to ensure consistent token generation
+    \item Thinking mode: disabled for Qwen3.5 models during generation and MMLU scoring
 \end{itemize}
 
 % =============================================================================
