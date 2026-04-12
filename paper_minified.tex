@@ -850,14 +850,71 @@ Phi-3 Mini & INT4 & 66.97 & 59.44 & 62.02 & 76.49 & 72.56 \\
 The full benchmark changes the statistical picture. With $n=14{,}042$, overall accuracy has a 95\% confidence interval of roughly $\pm 0.8$ pp, so the INT4 drops are no longer explainable as small-sample noise. Here is what the data shows:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{INT8 is essentially lossless for the 2B and larger models}: Qwen3.5-2B, Qwen3.5-4B, and Phi-3 Mini differ from FP16 by just --0.04, --0.04, and --0.07 pp, respectively. Qwen3.5-0.8B is the only model with a noticeable INT8 shift (--1.04 pp).
+    \item \textbf{INT8 is essentially lossless for the 2B and larger models}: relative to FP16, the drop is just 0.04 pp for Qwen3.5-2B, 0.04 pp for Qwen3.5-4B, and 0.07 pp for Phi-3 Mini. Qwen3.5-0.8B is the only model with a clearly visible INT8 shift (1.04 pp).
 
-    \item \textbf{INT4 introduces real but model-dependent degradation}: overall drops are --2.59 pp for Qwen3.5-0.8B, --7.90 pp for Qwen3.5-2B, --3.29 pp for Qwen3.5-4B, and --2.39 pp for Phi-3 Mini. The 4B-class models remain usable at INT4, but the loss is no longer negligible.
+    \item \textbf{INT4 introduces real but model-dependent degradation}: the full-MMLU drop is 2.59 pp for Qwen3.5-0.8B, 7.90 pp for Qwen3.5-2B, 3.29 pp for Qwen3.5-4B, and 2.39 pp for Phi-3 Mini. The 4B-class models remain usable at INT4, but the loss is no longer negligible.
 
-    \item \textbf{Category structure is stable under quantization}: Social Sciences is the strongest category for every configuration, while the largest INT4 degradation occurs for Qwen3.5-2B across all categories (6.95--9.41 pp). Qwen3.5-4B and Phi-3 Mini retain strong INT4 category-wise performance, especially in Social Sciences (79.10\%, 76.49\%) and Other (76.32\%, 72.56\%).
+    \item \textbf{Category structure is stable under quantization}: Social Sciences is the strongest category for every configuration. The largest INT4 degradation appears in Qwen3.5-2B, where all category drops fall between 6.95 and 9.41 pp. Qwen3.5-4B and Phi-3 Mini still post strong INT4 category scores, especially in Social Sciences and Other.
 
-    \item \textbf{Accuracy still scales with model quality}: Within the Qwen3.5 family, FP16 accuracy rises from 46.31\%$\to$56.59\%$\to$73.11\%, and INT4 rises from 43.73\%$\to$48.68\%$\to$69.82\%. The benefits of a stronger base model largely survive quantization.
+    \item \textbf{Accuracy still scales with model quality}: within the Qwen3.5 family, FP16 accuracy rises from 46.31\% to 56.59\% to 73.11\%. INT4 follows the same pattern, rising from 43.73\% to 48.68\% to 69.82\%. The benefits of a stronger base model largely survive quantization.
 \end{enumerate}
+
+\subsection{Energy--Accuracy Trade-off}
+
+To compare efficiency and quality directly, we define \textit{accuracy depreciation} as the full-MMLU drop relative to the FP16 model of the same family. We define \textit{estimated energy reduction} as $100 \times (1 - E_q/E_{\text{FP16}})$ for the same pair. Figure~\ref{fig:energy_accuracy_tradeoff} plots these two deltas together. Because CodeCarbon's estimate on Apple Silicon is largely a proxy for runtime, the vertical axis should be read as relative efficiency gain rather than hardware-measured power savings.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=\columnwidth,
+    height=6.4cm,
+    xlabel={Accuracy drop vs FP16 (pp)},
+    ylabel={Estimated energy reduction vs FP16 (\%)},
+    xmin=0,
+    xmax=8.5,
+    ymin=30,
+    ymax=80,
+    xtick={0,1,2,3,4,5,6,7,8},
+    ytick={30,40,50,60,70,80},
+    grid=both,
+    grid style={gray!20},
+    major grid style={gray!35},
+    legend style={at={(0.5,1.02)}, anchor=south, legend columns=2, font=\small},
+    legend image code/.code={\draw[fill,draw=none,#1] (0cm,-0.1cm) rectangle (0.3cm,0.2cm);}
+]
+\addplot[only marks, mark=square*, mark size=2.5pt, blue!70!black] coordinates {
+    (1.04,36.9)
+    (0.04,40.4)
+    (0.04,43.2)
+    (0.07,49.1)
+};
+\addplot[only marks, mark=*, mark size=2.7pt, orange!85!black] coordinates {
+    (2.59,50.9)
+    (7.90,60.5)
+    (3.29,66.1)
+    (2.39,73.7)
+};
+\legend{INT8, INT4}
+
+\node[font=\scriptsize, anchor=west] at (axis cs:0.10,40.6) {Q2};
+\node[font=\scriptsize, anchor=west] at (axis cs:0.10,43.7) {Q4};
+\node[font=\scriptsize, anchor=west] at (axis cs:0.15,49.6) {Phi};
+\node[font=\scriptsize, anchor=west] at (axis cs:1.12,37.4) {Q0.8};
+
+\node[font=\scriptsize, anchor=west] at (axis cs:2.47,74.2) {Phi};
+\node[font=\scriptsize, anchor=west] at (axis cs:2.67,51.4) {Q0.8};
+\node[font=\scriptsize, anchor=west] at (axis cs:3.37,66.6) {Q4};
+\node[font=\scriptsize, anchor=east] at (axis cs:7.75,61.0) {Q2};
+
+\node[font=\scriptsize, align=left, anchor=north east] at (rel axis cs:0.98,0.97) {Better trade-off:\\more energy saved,\\less accuracy lost};
+\end{axis}
+\end{tikzpicture}
+\caption{Energy--accuracy trade-off relative to each model's FP16 baseline. Upper-left points are preferable: less full-MMLU accuracy loss for more estimated energy reduction. INT8 occupies the low-loss region, while Phi-3 Mini INT4 and Qwen3.5-4B INT4 offer the strongest aggressive-quantization trade-offs.}
+\label{fig:energy_accuracy_tradeoff}
+\end{figure}
+
+Figure~\ref{fig:energy_accuracy_tradeoff} makes the practical trade-off easier to read than the raw tables. INT8 for Qwen3.5-2B, Qwen3.5-4B, and Phi-3 Mini sits in the low-loss, high-gain corner. These three settings cut estimated energy by 40.4--49.1\% while losing at most 0.07 pp on full MMLU. Among the aggressive INT4 configurations, Phi-3 Mini gives the strongest result: 73.7\% lower estimated energy for a 2.39 pp accuracy drop. Qwen3.5-4B INT4 is close behind at 66.1\% lower energy for a 3.29 pp drop. The clear outlier is Qwen3.5-2B INT4, which still saves 60.5\% energy but pays for it with the largest accuracy depreciation in the study (7.90 pp).
 
 \subsection{Experimental Limitations}
 
@@ -876,9 +933,9 @@ The full benchmark changes the statistical picture. With $n=14{,}042$, overall a
 Based on our experimental findings:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Quantization level}: INT4 provides the best throughput--memory trade-off for 4B-class models when a 2--3 pp MMLU drop is acceptable. For smaller models or accuracy-sensitive deployments, INT8 is the safer default.
+    \item \textbf{Quantization level}: INT4 provides the best throughput--memory trade-off for 4B-class models when a 2--3 pp MMLU drop is acceptable (Figure~\ref{fig:energy_accuracy_tradeoff}). For smaller models or accuracy-sensitive deployments, INT8 is the safer default.
 
-    \item \textbf{Model selection}: Qwen3.5-4B offers the best absolute accuracy at every precision, while Phi-3 Mini INT4 delivers the best large-model throughput with a slightly smaller INT4 accuracy drop than Qwen3.5-4B.
+    \item \textbf{Model selection}: Qwen3.5-4B offers the best absolute accuracy at every precision, while Phi-3 Mini INT4 delivers the strongest aggressive energy--accuracy trade-off: 73.7\% estimated energy reduction for only a 2.39 pp MMLU drop.
 \end{enumerate}
 
 % =============================================================================
