@@ -793,9 +793,9 @@ Table~\ref{tab:mmlu_accuracy} presents full MMLU accuracy across all models and 
 
 \begin{table}[htbp]
 \centering
+\small
 \caption{Full MMLU accuracy (\%) across quantization levels (logit-based scoring, all 57 subjects, $n=14{,}042$). Binomial 95\% confidence intervals around overall accuracy are approximately $\pm 0.8$ pp.}
 \label{tab:mmlu_accuracy}
-\resizebox{\textwidth}{!}{%
 \begin{tabular}{l l c c c c c}
 \toprule
 \textbf{Model} & \textbf{Quant} & \textbf{Overall} & \textbf{STEM} & \textbf{Human.} & \textbf{Social} & \textbf{Other} \\
@@ -813,8 +813,7 @@ Phi-3 Mini & FP16 & 69.36 & 61.72 & 64.00 & 79.07 & 75.52 \\
 Phi-3 Mini & INT8 & 69.29 & 61.91 & 63.93 & 78.88 & 75.29 \\
 Phi-3 Mini & INT4 & 66.97 & 59.44 & 62.02 & 76.49 & 72.56 \\
 \bottomrule
-\end{tabular}%
-}
+\end{tabular}
 \end{table}
 
 \begin{figure}[htbp]
