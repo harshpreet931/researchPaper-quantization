@@ -149,7 +149,7 @@ An Evaluation of Post-Training Quantization on Apple Silicon}
 % ABSTRACT
 % =============================================================================
 \begin{abstract}
-\noindent Running large language models on edge devices means squeezing them into tight memory budgets, without losing too much accuracy in the process. In this paper, we evaluate post-training quantization (PTQ) for small language models on Apple Silicon using Apple's MLX framework at three precision levels (FP16, INT8, INT4). We benchmark the Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B) on an M4 Pro with 24\,GB unified memory. INT4 gives us $2.0\times$--$3.8\times$ better throughput over FP16 and cuts memory by $3.5\times$--$3.6\times$. On the accuracy side, our logit-based MMLU evaluation (100 questions, 10 subjects) indicates that INT4 preserves most of FP16's accuracy for models above 3.8B parameters, with drops of just 1 percentage point for Qwen3.5-4B and Phi-3 Mini. Every model we tested fits within 2.5\,GB after INT4 quantization, which opens the door to edge deployment even on devices with only 8\,GB of RAM.
+\noindent Running large language models on edge devices means squeezing them into tight memory budgets, without losing too much accuracy in the process. In this paper, we evaluate post-training quantization (PTQ) for small language models on Apple Silicon using Apple's MLX framework at three precision levels (FP16, INT8, INT4). We benchmark the Qwen3.5 series (0.8B, 2B, 4B parameters) and Phi-3 Mini (3.82B) on an M4 Pro with 24\,GB unified memory. INT4 gives us $2.0\times$--$3.8\times$ better throughput over FP16 and cuts memory by $3.5\times$--$3.6\times$. On the accuracy side, our logit-based full MMLU evaluation (all 57 subjects, 14,042 questions) shows that INT8 is effectively lossless for the 2B and larger models, while INT4 introduces model-dependent drops of 2.39--7.90 percentage points. Even so, the 4B-class models retain strong INT4 accuracy (69.82\% for Qwen3.5-4B and 66.97\% for Phi-3 Mini). Every model we tested fits within 2.5\,GB after INT4 quantization, which opens the door to edge deployment even on devices with only 8\,GB of RAM.
 \end{abstract}
 
 % =============================================================================
@@ -955,10 +955,10 @@ Here is what we found:
 
     \item \textbf{Memory efficiency}: INT4 delivers $3.5\times$--$3.6\times$ memory reduction, with all models fitting within 2.5\,GB, enabling deployment on devices with 8\,GB RAM.
 
-    \item \textbf{Accuracy trends}: MMLU evaluation on 100 questions suggests that models above 3.8B parameters tolerate INT4 with minimal observed accuracy loss, though the small sample size limits statistical confidence.
+    \item \textbf{Full-MMLU accuracy}: On all 57 subjects (14,042 questions), INT8 is effectively lossless for the 2B and larger models, while INT4 causes measurable drops of 2.39--7.90 pp depending on the model. The 4B-class models absorb INT4 best, losing 2.39--3.29 pp overall.
 \end{enumerate}
 
-If there is one takeaway from this work, it is this: on Apple Silicon, INT4 quantization via MLX is currently the best option for models in the 1--5B parameter range, giving you the best combination of speed, memory efficiency, and accuracy retention. The key insight is that larger models benefit more from aggressive quantization, both in throughput gains and in accuracy resilience, which means INT4 is the right default for models above 3.8B parameters.
+If there is one takeaway from this work, it is this: on Apple Silicon, INT4 quantization via MLX is the best speed--memory option when a modest accuracy trade-off is acceptable, especially for 4B-class models. When accuracy is the primary constraint, INT8 is the safer near-lossless default. The broader lesson is that aggressive quantization should be chosen per model, not per bit-width alone.
 
 \begin{sloppypar}
 \noindent\textbf{Code and Data:} Available at \url{https://github.com/harshpreet931/researchPaper-quantization}
