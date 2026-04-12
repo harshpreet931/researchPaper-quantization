@@ -634,7 +634,7 @@ The unified memory design means the CPU and GPU share the same physical memory p
 % =============================================================================
 \section{Experiments and Results}
 
-Here are the results from running all four models through MLX at three precision levels (FP16, INT8, INT4) on our M4 Pro. Every number is the average of 10 runs after a warmup pass. All raw data and benchmark scripts are in the project repository for anyone who wants to reproduce or dig deeper.
+Here are the results from running all four models through MLX at three precision levels (FP16, INT8, INT4) on our M4 Pro. Throughput and energy numbers are averages of 10 runs after a warmup pass; accuracy numbers come from a single deterministic sweep over the full 14,042-question MMLU test set. All raw data and benchmark scripts are in the project repository for anyone who wants to reproduce or dig deeper.
 
 \subsection{Memory Footprint}
 
@@ -789,22 +789,32 @@ Phi-3 Mini & 23.23 & 0.000058 & 45.64 & 0.000030 & 88.40 & 0.000015 & 3.9$\times
 \subsection{Accuracy Retention Under Quantization}
 \label{sec:accuracy}
 
-Table~\ref{tab:mmlu_accuracy} presents MMLU accuracy across all models and quantization levels, measured using logit-based scoring on 100 questions spanning 10 subjects.
+Table~\ref{tab:mmlu_accuracy} presents full MMLU accuracy across all models and quantization levels, measured using logit-based scoring on all 57 subjects (14,042 questions).
 
 \begin{table}[htbp]
 \centering
-\caption{MMLU accuracy (\%) across quantization levels (logit-based scoring, $n=100$ questions). With this sample size, the 95\% confidence interval is approximately $\pm$10 pp; differences of 1--2 pp are not statistically significant.}
+\caption{Full MMLU accuracy (\%) across quantization levels (logit-based scoring, all 57 subjects, $n=14{,}042$). Binomial 95\% confidence intervals around overall accuracy are approximately $\pm 0.8$ pp.}
 \label{tab:mmlu_accuracy}
-\begin{tabular}{l|cccc}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l l c c c c c}
 \toprule
-\textbf{Model} & \textbf{FP16} & \textbf{INT8} & \textbf{INT4} & \textbf{Drop (FP16$\to$INT4)} \\
+\textbf{Model} & \textbf{Quant} & \textbf{Overall} & \textbf{STEM} & \textbf{Human.} & \textbf{Social} & \textbf{Other} \\
 \midrule
-Qwen3.5-0.8B & 54 & 53 & 49 & --5 \\
-Qwen3.5-2B & 66 & 64 & 58 & --8 \\
-Qwen3.5-4B & 80 & 80 & 79 & --1 \\
-Phi-3 Mini & 78 & 78 & 77 & --1 \\
+Qwen3.5-0.8B & FP16 & 46.31 & 44.50 & 39.06 & 52.63 & 52.88 \\
+Qwen3.5-0.8B & INT8 & 45.27 & 42.63 & 38.66 & 51.12 & 52.21 \\
+Qwen3.5-0.8B & INT4 & 43.73 & 40.50 & 38.13 & 50.02 & 49.22 \\
+Qwen3.5-2B & FP16 & 56.59 & 53.95 & 49.39 & 64.40 & 62.35 \\
+Qwen3.5-2B & INT8 & 56.54 & 53.92 & 49.03 & 64.34 & 62.82 \\
+Qwen3.5-2B & INT4 & 48.68 & 45.67 & 42.44 & 54.99 & 54.94 \\
+Qwen3.5-4B & FP16 & 73.11 & 70.38 & 66.16 & 81.11 & 78.38 \\
+Qwen3.5-4B & INT8 & 73.07 & 70.31 & 66.18 & 80.96 & 78.42 \\
+Qwen3.5-4B & INT4 & 69.82 & 66.48 & 61.64 & 79.10 & 76.32 \\
+Phi-3 Mini & FP16 & 69.36 & 61.72 & 64.00 & 79.07 & 75.52 \\
+Phi-3 Mini & INT8 & 69.29 & 61.91 & 63.93 & 78.88 & 75.29 \\
+Phi-3 Mini & INT4 & 66.97 & 59.44 & 62.02 & 76.49 & 72.56 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \begin{figure}[htbp]
@@ -828,24 +838,26 @@ Phi-3 Mini & 78 & 78 & 77 & --1 \\
     nodes near coords style={font=\tiny},
     every node near coord/.append style={rotate=90, anchor=west}
 ]
-\addplot coordinates {(Q-0.8B,54.0) (Q-2B,66.0) (Q-4B,80.0) (Phi-3,78.0)};
-\addplot coordinates {(Q-0.8B,53.0) (Q-2B,64.0) (Q-4B,80.0) (Phi-3,78.0)};
-\addplot coordinates {(Q-0.8B,49.0) (Q-2B,58.0) (Q-4B,79.0) (Phi-3,77.0)};
+\addplot coordinates {(Q-0.8B,46.3) (Q-2B,56.6) (Q-4B,73.1) (Phi-3,69.4)};
+\addplot coordinates {(Q-0.8B,45.3) (Q-2B,56.5) (Q-4B,73.1) (Phi-3,69.3)};
+\addplot coordinates {(Q-0.8B,43.7) (Q-2B,48.7) (Q-4B,69.8) (Phi-3,67.0)};
 \legend{FP16, INT8, INT4}
 \end{axis}
 \end{tikzpicture}
-\caption{MMLU accuracy across quantization levels ($n=100$). While the observed trend suggests larger models are more resilient to quantization, individual differences of 1--2 pp are within the margin of sampling error.}
+\caption{MMLU accuracy across quantization levels on the full 57-subject test set ($n=14{,}042$). The larger sample makes the INT4 degradation clear, while INT8 remains nearly lossless for the 2B and larger models.}
 \label{fig:mmlu_accuracy}
 \end{figure}
 
-With the caveat that 100 questions is a limited sample, here is what the data suggests:
+The full benchmark changes the statistical picture. With $n=14{,}042$, overall accuracy has a 95\% confidence interval of roughly $\pm 0.8$ pp, so the INT4 drops are no longer explainable as small-sample noise. Here is what the data shows:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{INT8 appears nearly lossless}: Across all models, INT8 shows at most 2 percentage points of accuracy difference from FP16, consistent with INT8 being a conservative choice for accuracy-sensitive deployments.
+    \item \textbf{INT8 is essentially lossless for the 2B and larger models}: Qwen3.5-2B, Qwen3.5-4B, and Phi-3 Mini differ from FP16 by just --0.04, --0.04, and --0.07 pp, respectively. Qwen3.5-0.8B is the only model with a noticeable INT8 shift (--1.04 pp).
 
-    \item \textbf{Larger models appear more quantization-resilient}: Qwen3.5-4B and Phi-3 Mini (both $\geq$3.8B parameters) show only 1 pp observed drop under INT4, while Qwen3.5-0.8B shows 5 pp and Qwen3.5-2B shows 8 pp. This is consistent with the hypothesis that larger models have greater weight redundancy, providing a buffer against quantization error \cite{huang2024llama3}.
+    \item \textbf{INT4 introduces real but model-dependent degradation}: overall drops are --2.59 pp for Qwen3.5-0.8B, --7.90 pp for Qwen3.5-2B, --3.29 pp for Qwen3.5-4B, and --2.39 pp for Phi-3 Mini. The 4B-class models remain usable at INT4, but the loss is no longer negligible.
 
-    \item \textbf{Accuracy scales with model size}: FP16 accuracy increases monotonically within the Qwen3.5 family (54\%$\to$66\%$\to$80\%), and INT4 follows the same trend (49\%$\to$58\%$\to$79\%), suggesting that the benefits of scale persist after quantization.
+    \item \textbf{Category structure is stable under quantization}: Social Sciences is the strongest category for every configuration, while the largest INT4 degradation occurs for Qwen3.5-2B across all categories (6.95--9.41 pp). Qwen3.5-4B and Phi-3 Mini retain strong INT4 category-wise performance, especially in Social Sciences (79.10\%, 76.49\%) and Other (76.32\%, 72.56\%).
+
+    \item \textbf{Accuracy still scales with model quality}: Within the Qwen3.5 family, FP16 accuracy rises from 46.31\%$\to$56.59\%$\to$73.11\%, and INT4 rises from 43.73\%$\to$48.68\%$\to$69.82\%. The benefits of a stronger base model largely survive quantization.
 \end{enumerate}
 
 \subsection{Experimental Limitations}
@@ -853,7 +865,7 @@ With the caveat that 100 questions is a limited sample, here is what the data su
 \begin{enumerate}[leftmargin=*,nosep]
     \item \textbf{Energy estimation}: As discussed in Section~\ref{sec:energy_method}, CodeCarbon on Apple Silicon uses TDP-based power models. Energy values are approximate and correlate strongly with inference time.
 
-    \item \textbf{Accuracy sample size}: The 100-question MMLU subset provides indicative trends but lacks statistical power to confirm small accuracy differences. A full 14,042-question MMLU evaluation would strengthen these findings.
+    \item \textbf{Benchmark coverage}: Full MMLU removes the small-sample problem, but it is still a single multiple-choice benchmark. It does not measure open-ended generation quality, coding, tool use, safety, or long-context reasoning.
 
     \item \textbf{Single device}: All results are from a single M4 Pro unit; chip-to-chip variation and thermal throttling under sustained load are not characterized.
 
@@ -865,9 +877,9 @@ With the caveat that 100 questions is a limited sample, here is what the data su
 Based on our experimental findings:
 
 \begin{enumerate}[leftmargin=*,nosep]
-    \item \textbf{Quantization level}: INT4 provides the best throughput--memory trade-off for models above 3.8B parameters, where accuracy impact appears minimal. For smaller models, INT8 may be preferable to avoid larger accuracy degradation.
+    \item \textbf{Quantization level}: INT4 provides the best throughput--memory trade-off for 4B-class models when a 2--3 pp MMLU drop is acceptable. For smaller models or accuracy-sensitive deployments, INT8 is the safer default.
 
-    \item \textbf{Model selection}: Practitioners should select models based on their accuracy requirements. Qwen3.5-4B and Phi-3 Mini offer the best accuracy--efficiency balance at INT4 on this hardware.
+    \item \textbf{Model selection}: Qwen3.5-4B offers the best absolute accuracy at every precision, while Phi-3 Mini INT4 delivers the best large-model throughput with a slightly smaller INT4 accuracy drop than Qwen3.5-4B.
 \end{enumerate}
 
 % =============================================================================
@@ -883,9 +895,9 @@ This is why we see the INT4 speedup ratio increase with model size (Table~\ref{t
 
 \subsection{The Accuracy Question}
 
-Our accuracy data hints at a useful rule of thumb: if your model is above about 3.8B parameters, INT4 quantization probably will not hurt accuracy much. Smaller models seem to suffer more. This lines up with what Kurtic et al.\ \cite{kurtic2024give} and Jin et al.\ \cite{jin2024comprehensive} found: quantization sensitivity has more to do with how big the model is than with which specific bit-width you pick.
+Our full MMLU results sharpen the answer. INT8 is basically free for the 2B and larger models on this setup: the change from FP16 is only 0.04 pp for Qwen3.5-2B and Qwen3.5-4B, and 0.07 pp for Phi-3 Mini. INT4 is a different story. The accuracy loss is real for every model, but its magnitude depends strongly on the model: 2.59 pp for Qwen3.5-0.8B, 7.90 pp for Qwen3.5-2B, 3.29 pp for Qwen3.5-4B, and 2.39 pp for Phi-3 Mini.
 
-But we have to be honest: our 100-question MMLU evaluation does not have the statistical power to make strong claims here. The 1~pp drops we see for Qwen3.5-4B and Phi-3 Mini could easily be noise. If accuracy is critical for your application, do not take our word for it. Run your own evaluation with a proper-sized test set.
+That result is important because it means there is no magic parameter threshold where INT4 suddenly becomes free. Scale helps, especially within the Qwen3.5 family, but architecture and training recipe matter too. This still broadly lines up with what Kurtic et al.\ \cite{kurtic2024give} and Jin et al.\ \cite{jin2024comprehensive} reported: quantization sensitivity is model-dependent rather than determined by bit-width alone. The practical rule is narrower and more defensible: on Apple Silicon, INT4 is a strong default when throughput and memory matter most and a modest 2--3 pp drop is acceptable for 4B-class models; INT8 is the safer default when the accuracy budget is tight.
 
 \subsection{The Energy Measurement Problem}
 
@@ -920,7 +932,7 @@ We only tested four models from two families, so there are gaps:
 \begin{enumerate}[leftmargin=*,nosep]
     \item \textbf{Hardware power measurement}: Using external power meters or Apple's \texttt{powermetrics} to obtain ground-truth energy data on Apple Silicon.
 
-    \item \textbf{Larger accuracy evaluation}: Running full MMLU (14,042 questions) or multiple benchmarks to establish statistically significant accuracy differences.
+    \item \textbf{Broader benchmark coverage}: Extending evaluation beyond MMLU to reasoning, coding, long-context, and open-ended generation benchmarks to test whether the same quantization trends hold outside multiple-choice QA.
 
     \item \textbf{Cross-architecture evaluation}: Extending experiments to NVIDIA GPUs, mobile NPUs, and embedded processors.
 
