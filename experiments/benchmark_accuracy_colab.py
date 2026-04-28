@@ -29,21 +29,13 @@ RESULTS_DIR = Path("results_accuracy_colab")
 RESULTS_DIR.mkdir(exist_ok=True)
 
 # Model configurations for Colab (using HF model IDs)
-# Note: We use standard HF models and apply quantization via bitsandbytes
+# Note: Qwen models run on CPU due to GPU compatibility issues with causal-conv1d
 MODELS = [
-    # Qwen3.5 FP16
+    # Qwen3.5 FP16 (CPU only - no INT8/INT4 support on CPU)
     ("Qwen/Qwen3.5-0.8B", "Qwen3.5-0.8B", "fp16"),
     ("Qwen/Qwen3.5-2B", "Qwen3.5-2B", "fp16"),
     ("Qwen/Qwen3.5-4B", "Qwen3.5-4B", "fp16"),
-    # Qwen3.5 INT8
-    ("Qwen/Qwen3.5-0.8B", "Qwen3.5-0.8B", "int8"),
-    ("Qwen/Qwen3.5-2B", "Qwen3.5-2B", "int8"),
-    ("Qwen/Qwen3.5-4B", "Qwen3.5-4B", "int8"),
-    # Qwen3.5 INT4
-    ("Qwen/Qwen3.5-0.8B", "Qwen3.5-0.8B", "int4"),
-    ("Qwen/Qwen3.5-2B", "Qwen3.5-2B", "int4"),
-    ("Qwen/Qwen3.5-4B", "Qwen3.5-4B", "int4"),
-    # Phi-3 Mini
+    # Phi-3 Mini (GPU with quantization support)
     ("microsoft/Phi-3-mini-4k-instruct", "Phi-3-Mini", "fp16"),
     ("microsoft/Phi-3-mini-4k-instruct", "Phi-3-Mini", "int8"),
     ("microsoft/Phi-3-mini-4k-instruct", "Phi-3-Mini", "int4"),
@@ -171,15 +163,28 @@ def get_prompt_tokens(q, model_name, tokenizer):
         if "Qwen" in model_name:
             kwargs["enable_thinking"] = False
         try:
-            return tokenizer.apply_chat_template(msgs, **kwargs)
+            tokens = tokenizer.apply_chat_template(msgs, **kwargs)
+            # Handle various return types
+            if hasattr(tokens, 'ids'):
+                return list(tokens.ids)
+            elif isinstance(tokens, (list, tuple)):
+                return [int(t) if not isinstance(t, int) else t for t in tokens]
         except TypeError:
             kwargs.pop("enable_thinking", None)
             try:
-                return tokenizer.apply_chat_template(msgs, **kwargs)
+                tokens = tokenizer.apply_chat_template(msgs, **kwargs)
+                if hasattr(tokens, 'ids'):
+                    return list(tokens.ids)
+                elif isinstance(tokens, (list, tuple)):
+                    return [int(t) if not isinstance(t, int) else t for t in tokens]
             except Exception:
                 pass
 
-    return tokenizer.encode(raw)
+    # Fallback to simple encode
+    tokens = tokenizer.encode(raw, add_special_tokens=False)
+    if hasattr(tokens, 'ids'):
+        return list(tokens.ids)
+    return list(tokens)
 
 
 def build_answer_token_map(tokenizer):
@@ -197,11 +202,12 @@ def build_answer_token_map(tokenizer):
 
 def score_by_logits(model, tokens, answer_token_map, device):
     """Run a single forward pass and return the best A/B/C/D answer."""
-    input_ids = torch.tensor([tokens], device=device)
-    
+    tokens = [int(t) for t in tokens]
+    input_ids = torch.tensor([tokens])
+
     with torch.no_grad():
         outputs = model(input_ids)
-        logits = outputs.logits[0, -1, :]  # (vocab_size,)
+        logits = outputs.logits[0, -1, :]
 
     answer_logits = {}
     for letter in LETTERS:
@@ -218,23 +224,38 @@ def score_by_logits(model, tokens, answer_token_map, device):
 def load_model(model_path, quant_method, device):
     """Load model with specified quantization using transformers + bitsandbytes."""
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-    
+
+    common_kwargs = {
+        "trust_remote_code": True,
+    }
+
+    is_qwen = "Qwen" in model_path
+    use_gpu = device == "cuda" and not is_qwen
+
+    if use_gpu:
+        common_kwargs["device_map"] = "auto"
+
     if quant_method == "fp16":
+        dtype = torch.float16 if use_gpu else torch.float32
         model = AutoModelForCausalLM.from_pretrained(
             model_path,
-            torch_dtype=torch.float16,
-            device_map="auto",
-            trust_remote_code=True,
+            torch_dtype=dtype,
+            **common_kwargs,
         )
+        if not use_gpu:
+            model = model.to("cpu")
     elif quant_method == "int8":
+        if is_qwen:
+            raise ValueError("INT8 not supported for Qwen models on this platform")
         bnb_config = BitsAndBytesConfig(load_in_8bit=True)
         model = AutoModelForCausalLM.from_pretrained(
             model_path,
             quantization_config=bnb_config,
-            device_map="auto",
-            trust_remote_code=True,
+            **common_kwargs,
         )
     elif quant_method == "int4":
+        if is_qwen:
+            raise ValueError("INT4 not supported for Qwen models on this platform")
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
             bnb_4bit_compute_dtype=torch.float16,
@@ -244,12 +265,11 @@ def load_model(model_path, quant_method, device):
         model = AutoModelForCausalLM.from_pretrained(
             model_path,
             quantization_config=bnb_config,
-            device_map="auto",
-            trust_remote_code=True,
+            **common_kwargs,
         )
     else:
         raise ValueError(f"Unknown quantization method: {quant_method}")
-    
+
     model.eval()
     return model, tokenizer
 
@@ -290,9 +310,10 @@ def run_accuracy_benchmark(model_path, model_name, quant_method, questions, resu
     }
 
     try:
-        device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"Device: {device}")
-        
+        is_qwen = "Qwen" in model_path
+        device = "cuda" if torch.cuda.is_available() and not is_qwen else "cpu"
+        print(f"Device: {device}" + (" (Qwen forced to CPU)" if is_qwen and torch.cuda.is_available() else ""))
+
         load_start = time.time()
         model, tokenizer = load_model(model_path, quant_method, device)
         load_time = time.time() - load_start
@@ -308,7 +329,10 @@ def run_accuracy_benchmark(model_path, model_name, quant_method, questions, resu
         answer_token_map = build_answer_token_map(tokenizer)
 
         # Warmup
-        warmup_ids = torch.tensor([tokenizer.encode("Hello")], device=device)
+        warmup_tokens = tokenizer.encode("Hello", add_special_tokens=False)
+        if hasattr(warmup_tokens, 'ids'):
+            warmup_tokens = list(warmup_tokens.ids)
+        warmup_ids = torch.tensor([list(warmup_tokens)])
         with torch.no_grad():
             _ = model(warmup_ids)
 
@@ -443,7 +467,7 @@ def main():
         action="store_true",
         help="Skip model configs that already have a result file",
     )
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
 
     questions = load_mmlu_questions()
 
