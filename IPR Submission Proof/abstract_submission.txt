@@ -1,0 +1,13 @@
+Title: Low Power Edge Inference for Green Computing: An Evaluation of Post-Training Quantization on Apple Silicon
+
+Authors: Harshpreet Singh, Sameer Kumar
+Affiliation: Chitkara University Institute of Engineering and Technology, Chitkara University, Punjab, India
+Email: harshpreet393.be22@chitkara.edu.in, sameer776.be22@chitkara.edu.in
+
+---
+
+Abstract:
+
+This paper evaluates post-training quantization (PTQ) as a practical strategy for deploying small language models on edge devices under tight memory and energy constraints. The study benchmarks three quantization precision levels — FP16, INT8, and INT4 — using Apple's MLX framework on an Apple M4 Pro with 24 GB of unified memory. Four models are evaluated: the Qwen3.5 series (0.8B, 2B, and 4B parameters) and Phi-3 Mini (3.82B parameters). The evaluation covers throughput, memory footprint, estimated energy consumption, and task accuracy measured through logit-based scoring on the full MMLU benchmark (57 subjects, 14,042 questions). Results show that INT4 quantization achieves 2.0x–3.8x throughput improvement over FP16 and reduces memory usage by 3.5x–3.6x, with all models fitting within 2.5 GB. INT8 quantization is found to be effectively lossless for models with 2B or more parameters, with accuracy drops under 0.1 percentage points. INT4 introduces model-dependent accuracy reductions of 2.39–7.90 percentage points, with 4B-class models demonstrating the strongest resilience. The findings demonstrate that INT4 quantization via MLX is a viable path to edge deployment on devices with as little as 8 GB of RAM, and that quantization sensitivity is governed by model architecture rather than bit-width alone.
+
+Word count: 196
